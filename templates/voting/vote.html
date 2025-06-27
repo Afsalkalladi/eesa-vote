@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+
+{% block title %}Vote{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Voting Header -->
+        <div class="card voting-card mb-4">
+            <div class="card-body text-center">
+                <h1 class="card-title">
+                    <i class="bi bi-ballot text-primary me-2"></i>
+                    Cast Your Vote
+                </h1>
+                <p class="card-text">
+                    Welcome, <strong>{{ voter.name }}</strong>! 
+                    Please select one candidate for each position below.
+                </p>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    You can only vote once. Please review your selections carefully before submitting.
+                </div>
+            </div>
+        </div>
+
+        <!-- Voting Form -->
+        <form id="votingForm" method="post" action="{% url 'submit_vote' %}">
+            {% csrf_token %}
+            
+            {% for position_data in positions_data %}
+                <div class="card voting-card mb-4">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-award text-primary me-2"></i>
+                            {{ position_data.position.title }}
+                        </h3>
+                        {% if position_data.position.description %}
+                            <p class="mb-0 mt-2 text-muted">{{ position_data.position.description }}</p>
+                        {% endif %}
+                        <small class="text-muted">
+                            <i class="bi bi-clock me-1"></i>
+                            Voting ends: {{ position_data.position.end_time|date:"M d, Y H:i" }}
+                        </small>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="row">
+                            {% for candidate in position_data.candidates %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="candidate-option">
+                                        <label class="form-check-label w-100" for="candidate_{{ position_data.position.id }}_{{ candidate.id }}">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" 
+                                                       name="position_{{ position_data.position.id }}" 
+                                                       value="{{ candidate.id }}"
+                                                       id="candidate_{{ position_data.position.id }}_{{ candidate.id }}"
+                                                       required>
+                                                
+                                                <div class="candidate-info ms-3">
+                                                    {% if candidate.photo %}
+                                                        <div class="mb-2">
+                                                            <img src="{{ candidate.photo.url }}" 
+                                                                 alt="{{ candidate.name }}" 
+                                                                 class="rounded-circle"
+                                                                 style="width: 60px; height: 60px; object-fit: cover;">
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="mb-2">
+                                                            <i class="bi bi-person-circle display-4 text-muted"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                    
+                                                    <h5 class="mb-1">{{ candidate.name }}</h5>
+                                                    <p class="mb-1 text-muted">{{ candidate.reg_no }}</p>
+                                                    
+                                                    {% if candidate.bio %}
+                                                        <p class="small text-muted mb-0">{{ candidate.bio|truncatewords:20 }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Skip option -->
+                        <div class="mt-3 pt-3 border-top">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" 
+                                       name="position_{{ position_data.position.id }}" 
+                                       value=""
+                                       id="skip_{{ position_data.position.id }}">
+                                <label class="form-check-label text-muted" for="skip_{{ position_data.position.id }}">
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Skip this position (abstain from voting)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Submit Section -->
+            <div class="card voting-card">
+                <div class="card-body text-center">
+                    <h4 class="card-title text-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Final Step: Submit Your Vote
+                    </h4>
+                    <p class="card-text">
+                        Please review your selections above. Once submitted, you cannot change your vote.
+                    </p>
+                    
+                    <!-- Vote Summary -->
+                    <div id="voteSummary" class="alert alert-light d-none">
+                        <h6>Your Vote Summary:</h6>
+                        <ul id="summaryList" class="list-unstyled mb-0"></ul>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="button" class="btn btn-outline-secondary me-2" onclick="reviewSelections()">
+                            <i class="bi bi-eye me-2"></i>
+                            Review Selections
+                        </button>
+                        <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                            <i class="bi bi-check2-square me-2"></i>
+                            Submit My Vote
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-question-circle text-warning me-2"></i>
+                    Confirm Your Vote
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to submit your vote? This action cannot be undone.</p>
+                <div id="modalSummary"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Go Back
+                </button>
+                <button type="button" class="btn btn-success" id="finalSubmitBtn">
+                    <i class="bi bi-check2-square me-2"></i>
+                    Yes, Submit Vote
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let confirmModal;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        
+        // Form submission handler
+        document.getElementById('votingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showConfirmation();
+        });
+        
+        // Final submit button handler
+        document.getElementById('finalSubmitBtn').addEventListener('click', function() {
+            submitVote();
+        });
+        
+        // Auto-update summary when selections change
+        document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+            radio.addEventListener('change', updateVoteSummary);
+        });
+    });
+    
+    function reviewSelections() {
+        updateVoteSummary();
+        const summary = document.getElementById('voteSummary');
+        summary.classList.remove('d-none');
+        summary.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function updateVoteSummary() {
+        const summaryList = document.getElementById('summaryList');
+        summaryList.innerHTML = '';
+        
+        {% for position_data in positions_data %}
+            const selected{{ position_data.position.id }} = document.querySelector('input[name="position_{{ position_data.position.id }}"]:checked');
+            if (selected{{ position_data.position.id }} && selected{{ position_data.position.id }}.value) {
+                const candidateLabel = selected{{ position_data.position.id }}.closest('.candidate-option').querySelector('.candidate-info h5').textContent;
+                const li = document.createElement('li');
+                li.innerHTML = '<strong>{{ position_data.position.title }}:</strong> ' + candidateLabel;
+                summaryList.appendChild(li);
+            } else if (selected{{ position_data.position.id }}) {
+                const li = document.createElement('li');
+                li.innerHTML = '<strong>{{ position_data.position.title }}:</strong> <em>Abstained</em>';
+                li.className = 'text-muted';
+                summaryList.appendChild(li);
+            }
+        {% endfor %}
+        
+        if (summaryList.children.length === 0) {
+            const li = document.createElement('li');
+            li.innerHTML = '<em>No selections made yet</em>';
+            li.className = 'text-muted';
+            summaryList.appendChild(li);
+        }
+    }
+    
+    function showConfirmation() {
+        updateVoteSummary();
+        
+        // Copy summary to modal
+        const modalSummary = document.getElementById('modalSummary');
+        const summaryList = document.getElementById('summaryList');
+        modalSummary.innerHTML = '<div class="alert alert-info"><h6>Your Selections:</h6>' + summaryList.innerHTML + '</div>';
+        
+        confirmModal.show();
+    }
+    
+    function submitVote() {
+        const submitBtn = document.getElementById('finalSubmitBtn');
+        const originalText = showLoading(submitBtn);
+        
+        // Collect form data
+        const formData = new FormData(document.getElementById('votingForm'));
+        
+        fetch('{% url "submit_vote" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCSRFToken()
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading(submitBtn, originalText);
+            confirmModal.hide();
+            
+            if (data.success) {
+                // Show success message and redirect
+                const successAlert = document.createElement('div');
+                successAlert.className = 'alert alert-success alert-dismissible fade show';
+                successAlert.innerHTML = `
+                    <i class="bi bi-check-circle me-2"></i>
+                    ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                document.querySelector('main').insertBefore(successAlert, document.querySelector('main').firstChild);
+                
+                // Redirect after a delay
+                setTimeout(() => {
+                    window.location.href = '{% url "voting_complete" %}';
+                }, 2000);
+            } else {
+                // Show error message
+                const errorAlert = document.createElement('div');
+                errorAlert.className = 'alert alert-danger alert-dismissible fade show';
+                errorAlert.innerHTML = `
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    ${data.error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                document.querySelector('main').insertBefore(errorAlert, document.querySelector('main').firstChild);
+            }
+        })
+        .catch(error => {
+            hideLoading(submitBtn, originalText);
+            confirmModal.hide();
+            
+            const errorAlert = document.createElement('div');
+            errorAlert.className = 'alert alert-danger alert-dismissible fade show';
+            errorAlert.innerHTML = `
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                An error occurred while submitting your vote. Please try again.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.querySelector('main').insertBefore(errorAlert, document.querySelector('main').firstChild);
+        });
+    }
+    
+    // Check voting time limits
+    function checkVotingStatus() {
+        {% for position_data in positions_data %}
+            const endTime{{ position_data.position.id }} = new Date('{{ position_data.position.end_time|date:"c" }}');
+            if (new Date() > endTime{{ position_data.position.id }}) {
+                // Disable voting for this position
+                document.querySelectorAll('input[name="position_{{ position_data.position.id }}"]').forEach(input => {
+                    input.disabled = true;
+                });
+                
+                // Show warning
+                const positionCard = document.querySelector('input[name="position_{{ position_data.position.id }}"]').closest('.card');
+                const warning = document.createElement('div');
+                warning.className = 'alert alert-warning mt-3';
+                warning.innerHTML = '<i class="bi bi-clock me-2"></i>Voting for this position has ended.';
+                positionCard.querySelector('.card-body').appendChild(warning);
+            }
+        {% endfor %}
+    }
+    
+    // Check status every minute
+    checkVotingStatus();
+    setInterval(checkVotingStatus, 60000);
+</script>
+{% endblock %}

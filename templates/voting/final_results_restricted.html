@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block title %}Final Results - Not Available{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Restriction Notice -->
+        <div class="card voting-card text-center">
+            <div class="card-body py-5">
+                <div class="mb-4">
+                    <i class="bi bi-hourglass-split text-warning" style="font-size: 5rem;"></i>
+                </div>
+                
+                <h1 class="card-title text-warning mb-3">
+                    Final Results Not Yet Available
+                </h1>
+                
+                <p class="card-text lead mb-4">
+                    Final election results will be available when one of the following conditions is met:
+                </p>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="condition-card p-3 border rounded {% if all_voting_ended %}bg-success text-white{% else %}bg-light{% endif %}">
+                            <h5>
+                                <i class="bi bi-clock-fill me-2"></i>
+                                Voting Period Ends
+                            </h5>
+                            <p class="mb-0">
+                                {% if all_voting_ended %}
+                                    ✅ All voting periods have ended
+                                {% else %}
+                                    ⏳ Voting is still active
+                                    {% if next_end_time %}
+                                        <br><small>Next deadline: {{ next_end_time|date:"M d, Y H:i" }}</small>
+                                    {% endif %}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="condition-card p-3 border rounded {% if all_voters_voted %}bg-success text-white{% else %}bg-light{% endif %}">
+                            <h5>
+                                <i class="bi bi-people-fill me-2"></i>
+                                All Voters Complete
+                            </h5>
+                            <p class="mb-0">
+                                {% if all_voters_voted %}
+                                    ✅ All registered voters have voted
+                                {% else %}
+                                    📊 {{ total_voted }} of {{ total_voters }} voters have voted
+                                    {% if total_voters > 0 %}
+                                        {% widthratio total_voted total_voters 100 as turnout %}
+                                        <br><small>{{ turnout }}% turnout</small>
+                                    {% endif %}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress Information -->
+                {% if total_voters > 0 and not all_voters_voted %}
+                    <div class="progress mb-4" style="height: 25px;">
+                        {% widthratio total_voted total_voters 100 as turnout_percent %}
+                        <div class="progress-bar bg-info" 
+                             style="width: {{ turnout_percent }}%"
+                             role="progressbar">
+                            {{ total_voted }} / {{ total_voters }} voters ({{ turnout_percent }}%)
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- Alternative Actions -->
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'live_results' %}" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-bar-chart me-2"></i>
+                            View Live Results
+                        </a>
+                        <small class="text-muted d-block mt-2">
+                            See current vote counts and trends
+                        </small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'index' %}" class="btn btn-outline-primary btn-lg w-100">
+                            <i class="bi bi-house me-2"></i>
+                            Back to Home
+                        </a>
+                        <small class="text-muted d-block mt-2">
+                            Return to the main page
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Status -->
+        <div class="card voting-card mt-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-info-circle text-primary me-2"></i>
+                    Current Election Status
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Voting Progress</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Total Registered Voters:</strong> {{ total_voters }}</li>
+                            <li><strong>Votes Cast:</strong> {{ total_voted }}</li>
+                            <li><strong>Remaining:</strong> {{ total_voters|add:"-"|add:total_voted }}</li>
+                            <li><strong>Turnout:</strong> 
+                                {% if total_voters > 0 %}
+                                    {% widthratio total_voted total_voters 100 as turnout %}
+                                    {{ turnout }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Time Information</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Current Time:</strong> {{ current_time|date:"M d, Y H:i" }}</li>
+                            {% if next_end_time %}
+                                <li><strong>Next Voting Deadline:</strong> {{ next_end_time|date:"M d, Y H:i" }}</li>
+                                {% if not all_voting_ended %}
+                                    <li><strong>Time Remaining:</strong> 
+                                        <span id="countdown" class="text-primary"></span>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                            <li><strong>All Voting Ended:</strong> 
+                                {% if all_voting_ended %}
+                                    <span class="text-success">✅ Yes</span>
+                                {% else %}
+                                    <span class="text-warning">⏳ No</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auto-refresh Notice -->
+        <div class="card voting-card mt-4">
+            <div class="card-body text-center">
+                <h6 class="card-title">
+                    <i class="bi bi-arrow-clockwise text-primary me-2"></i>
+                    Auto-refresh Active
+                </h6>
+                <p class="card-text text-muted mb-0">
+                    This page will automatically refresh every 30 seconds to check if final results are available.
+                </p>
+                <small class="text-muted">
+                    Last checked: <span id="lastChecked">{{ current_time|time:"H:i:s" }}</span>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh page every 30 seconds
+    setInterval(function() {
+        location.reload();
+    }, 30000);
+    
+    // Update last checked time
+    function updateLastChecked() {
+        const now = new Date();
+        document.getElementById('lastChecked').textContent = now.toLocaleTimeString();
+    }
+    
+    // Countdown timer (if voting is still active)
+    {% if next_end_time and not all_voting_ended %}
+        const endTime = new Date('{{ next_end_time|date:"c" }}');
+        
+        function updateCountdown() {
+            const now = new Date();
+            const timeLeft = endTime - now;
+            
+            if (timeLeft <= 0) {
+                document.getElementById('countdown').innerHTML = '<span class="text-success">Voting has ended!</span>';
+                // Refresh page to check if results are now available
+                setTimeout(() => location.reload(), 2000);
+                return;
+            }
+            
+            const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            
+            document.getElementById('countdown').textContent = 
+                `${hours}h ${minutes}m ${seconds}s`;
+        }
+        
+        // Update countdown every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    {% endif %}
+    
+    // Update last checked time every second
+    setInterval(updateLastChecked, 1000);
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .condition-card {
+        transition: all 0.3s ease;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .condition-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .bg-success .condition-card:hover {
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+    
+    #countdown {
+        font-weight: bold;
+        font-family: 'Courier New', monospace;
+    }
+</style>
+{% endblock %}

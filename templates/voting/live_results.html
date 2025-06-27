@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+
+{% block title %}Live Results{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header -->
+        <div class="card voting-card mb-4">
+            <div class="card-body text-center">
+                <h1 class="card-title">
+                    <i class="bi bi-graph-up text-primary me-2"></i>
+                    Live Election Results
+                </h1>
+                <p class="card-text text-muted">
+                    Real-time voting results • Updates every {{ settings.results_refresh_interval }} seconds
+                </p>
+            </div>
+        </div>
+
+        <!-- Overall Statistics -->
+        <div class="card voting-card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-pie-chart text-primary me-2"></i>
+                    Overall Statistics
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-item">
+                            <h2 class="text-primary mb-0">{{ total_voters }}</h2>
+                            <p class="text-muted mb-0">Total Voters</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-item">
+                            <h2 class="text-success mb-0">{{ total_voted }}</h2>
+                            <p class="text-muted mb-0">Votes Cast</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-item">
+                            <h2 class="text-info mb-0">{{ total_voters|add:"-"|add:total_voted }}</h2>
+                            <p class="text-muted mb-0">Pending</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-item">
+                            {% widthratio total_voted total_voters 100 as turnout %}
+                            <h2 class="text-warning mb-0">{{ turnout|default:0 }}%</h2>
+                            <p class="text-muted mb-0">Turnout</p>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if total_voters > 0 %}
+                    <div class="mt-3">
+                        <div class="progress" style="height: 20px;">
+                            {% widthratio total_voted total_voters 100 as turnout_percent %}
+                            <div class="progress-bar bg-success" 
+                                 style="width: {{ turnout_percent|default:0 }}%"
+                                 role="progressbar">
+                                {{ turnout_percent|default:0 }}%
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Position Results -->
+        {% for result in results_data %}
+            <div class="card voting-card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-award text-primary me-2"></i>
+                        {{ result.position.title }}
+                    </h3>
+                    <div>
+                        {% if result.status == 'Active' %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-circle-fill me-1"></i>Active
+                            </span>
+                        {% elif result.status == 'Ended' %}
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-stop-circle me-1"></i>Ended
+                            </span>
+                        {% else %}
+                            <span class="badge bg-warning">
+                                <i class="bi bi-clock me-1"></i>Not Started
+                            </span>
+                        {% endif %}
+                        <span class="badge bg-info ms-2">{{ result.total_votes }} votes</span>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    {% if result.candidates %}
+                        <div class="row">
+                            {% for candidate_data in result.candidates %}
+                                <div class="col-lg-6 mb-3">
+                                    <div class="candidate-result p-3 border rounded position-relative">
+                                        {% if forloop.first and result.total_votes > 0 %}
+                                            <div class="winner-badge position-absolute top-0 end-0">
+                                                <i class="bi bi-trophy"></i> Leading
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="me-3">
+                                                <i class="bi bi-person-circle fs-2 text-muted"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h5 class="mb-1">{{ candidate_data.candidate.name }}</h5>
+                                                <p class="text-muted mb-0 small">{{ candidate_data.candidate.reg_no }}</p>
+                                            </div>
+                                            <div class="text-end">
+                                                <h4 class="mb-0 text-primary">{{ candidate_data.votes }}</h4>
+                                                <small class="text-muted">
+                                                    {{ candidate_data.percentage }}%
+                                                </small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar 
+                                                {% if forloop.first and result.total_votes > 0 %}
+                                                    bg-success
+                                                {% else %}
+                                                    bg-primary
+                                                {% endif %}" 
+                                                 style="width: {{ candidate_data.percentage }}%">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-inbox display-4"></i>
+                            <p class="mt-2">No votes cast yet for this position</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if result.position.description %}
+                    <div class="card-footer text-muted">
+                        <small>{{ result.position.description }}</small>
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div class="card voting-card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-inbox display-1 text-muted"></i>
+                    <h3 class="mt-3 text-muted">No Active Positions</h3>
+                    <p class="text-muted">There are currently no active voting positions.</p>
+                </div>
+            </div>
+        {% endfor %}
+
+        <!-- Auto-refresh Controls -->
+        <div class="card voting-card">
+            <div class="card-body text-center">
+                <h5 class="card-title">
+                    <i class="bi bi-arrow-clockwise text-primary me-2"></i>
+                    Auto-Refresh
+                </h5>
+                <p class="card-text">
+                    Results update automatically every {{ settings.results_refresh_interval }} seconds
+                </p>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" id="pauseRefresh">
+                        <i class="bi bi-pause-fill me-2"></i>Pause
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="resumeRefresh" style="display: none;">
+                        <i class="bi bi-play-fill me-2"></i>Resume
+                    </button>
+                    <button type="button" class="btn btn-primary" id="refreshNow">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Refresh Now
+                    </button>
+                </div>
+                <p class="small text-muted mt-2">
+                    Last updated: <span id="lastUpdated">{{ current_time|date:"H:i:s" }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let refreshInterval;
+    let isPaused = false;
+    const refreshRate = {{ settings.results_refresh_interval }} * 1000; // Convert to milliseconds
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        startAutoRefresh();
+        
+        // Control buttons
+        document.getElementById('pauseRefresh').addEventListener('click', pauseRefresh);
+        document.getElementById('resumeRefresh').addEventListener('click', resumeRefresh);
+        document.getElementById('refreshNow').addEventListener('click', refreshResults);
+    });
+    
+    function startAutoRefresh() {
+        if (!isPaused) {
+            refreshInterval = setInterval(refreshResults, refreshRate);
+        }
+    }
+    
+    function pauseRefresh() {
+        isPaused = true;
+        clearInterval(refreshInterval);
+        document.getElementById('pauseRefresh').style.display = 'none';
+        document.getElementById('resumeRefresh').style.display = 'inline-block';
+    }
+    
+    function resumeRefresh() {
+        isPaused = false;
+        startAutoRefresh();
+        document.getElementById('pauseRefresh').style.display = 'inline-block';
+        document.getElementById('resumeRefresh').style.display = 'none';
+    }
+    
+    function refreshResults() {
+        fetch('{% url "live_results_api" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error fetching results:', data.error);
+                    return;
+                }
+                
+                updateResults(data);
+                updateLastUpdated();
+            })
+            .catch(error => {
+                console.error('Error refreshing results:', error);
+            });
+    }
+    
+    function updateResults(data) {
+        // Update overall statistics
+        document.querySelector('.stat-item h2.text-primary').textContent = data.total_voters;
+        document.querySelector('.stat-item h2.text-success').textContent = data.total_voted;
+        document.querySelector('.stat-item h2.text-info').textContent = data.total_voters - data.total_voted;
+        
+        const turnoutPercent = data.total_voters > 0 ? Math.round((data.total_voted / data.total_voters) * 100) : 0;
+        document.querySelector('.stat-item h2.text-warning').textContent = turnoutPercent + '%';
+        
+        // Update progress bar
+        const progressBar = document.querySelector('.progress-bar');
+        if (progressBar) {
+            progressBar.style.width = turnoutPercent + '%';
+            progressBar.textContent = turnoutPercent + '%';
+        }
+        
+        // Update position results
+        data.results.forEach((result, index) => {
+            const positionCards = document.querySelectorAll('.card.voting-card');
+            // Skip first two cards (header and stats)
+            const positionCard = positionCards[index + 2];
+            
+            if (positionCard) {
+                // Update vote count badge
+                const voteBadge = positionCard.querySelector('.badge.bg-info');
+                if (voteBadge) {
+                    voteBadge.textContent = result.total_votes + ' votes';
+                }
+                
+                // Update candidate results
+                const candidateResults = positionCard.querySelectorAll('.candidate-result');
+                result.candidates.forEach((candidate, candidateIndex) => {
+                    const candidateElement = candidateResults[candidateIndex];
+                    if (candidateElement) {
+                        // Update vote count
+                        candidateElement.querySelector('h4.text-primary').textContent = candidate.votes;
+                        candidateElement.querySelector('.text-muted small').textContent = candidate.percentage + '%';
+                        
+                        // Update progress bar
+                        const progressBar = candidateElement.querySelector('.progress-bar');
+                        progressBar.style.width = candidate.percentage + '%';
+                        
+                        // Update leading badge
+                        const leadingBadge = candidateElement.querySelector('.winner-badge');
+                        if (candidateIndex === 0 && result.total_votes > 0) {
+                            if (!leadingBadge) {
+                                const badge = document.createElement('div');
+                                badge.className = 'winner-badge position-absolute top-0 end-0';
+                                badge.innerHTML = '<i class="bi bi-trophy"></i> Leading';
+                                candidateElement.appendChild(badge);
+                            }
+                            progressBar.className = 'progress-bar bg-success';
+                        } else {
+                            if (leadingBadge) {
+                                leadingBadge.remove();
+                            }
+                            progressBar.className = 'progress-bar bg-primary';
+                        }
+                    }
+                });
+            }
+        });
+    }
+    
+    function updateLastUpdated() {
+        const now = new Date();
+        document.getElementById('lastUpdated').textContent = now.toLocaleTimeString();
+    }
+    
+    // Clean up interval when page is unloaded
+    window.addEventListener('beforeunload', function() {
+        clearInterval(refreshInterval);
+    });
+</script>
+{% endblock %}

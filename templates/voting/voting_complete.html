@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Voting Complete{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Success Message -->
+        <div class="card voting-card text-center">
+            <div class="card-body py-5">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                </div>
+                
+                <h1 class="card-title text-success mb-3">
+                    Vote Successfully Recorded!
+                </h1>
+                
+                <p class="card-text lead mb-4">
+                    Thank you, <strong>{{ voter.name }}</strong>! Your vote has been securely recorded 
+                    and will be counted in the final results.
+                </p>
+                
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Vote Timestamp:</strong> {{ voter.voted_at|date:"F d, Y g:i A" }}
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'live_results' %}" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-bar-chart me-2"></i>
+                            View Live Results
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'final_results' %}" class="btn btn-outline-primary btn-lg w-100">
+                            <i class="bi bi-trophy me-2"></i>
+                            View Final Results
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Important Information -->
+        <div class="card voting-card mt-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-shield-check text-primary me-2"></i>
+                    Your Vote is Secure
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-lock-fill text-success me-2"></i>Anonymity Protected</h6>
+                        <p class="small text-muted">
+                            While votes are internally linked for audit purposes, 
+                            your individual choices remain anonymous in all public displays.
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-database-check text-success me-2"></i>Securely Stored</h6>
+                        <p class="small text-muted">
+                            Your vote is encrypted and stored securely. 
+                            The system prevents duplicate voting and tampering.
+                        </p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <h6><i class="bi bi-question-circle text-info me-2"></i>Questions or Concerns?</h6>
+                    <p class="small text-muted mb-0">
+                        If you have any questions about the voting process or results, 
+                        please contact the election committee.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="card voting-card mt-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-arrow-right-circle text-primary me-2"></i>
+                    What Happens Next?
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="d-flex mb-3">
+                        <div class="me-3">
+                            <i class="bi bi-1-circle-fill text-primary fs-4"></i>
+                        </div>
+                        <div>
+                            <h6>Vote Counting</h6>
+                            <p class="small text-muted mb-0">
+                                All votes are being counted automatically and securely.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="me-3">
+                            <i class="bi bi-2-circle-fill text-primary fs-4"></i>
+                        </div>
+                        <div>
+                            <h6>Live Updates</h6>
+                            <p class="small text-muted mb-0">
+                                {% if settings.show_live_results %}
+                                    You can view live results as votes are counted.
+                                {% else %}
+                                    Live results are currently disabled.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="me-3">
+                            <i class="bi bi-3-circle-fill text-primary fs-4"></i>
+                        </div>
+                        <div>
+                            <h6>Final Results</h6>
+                            <p class="small text-muted mb-0">
+                                Official results will be announced after voting closes for all positions.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="text-center mt-4">
+            <a href="{% url 'logout_voter' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-box-arrow-right me-2"></i>
+                Logout
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .timeline .d-flex:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: 1.1rem;
+        top: 2.5rem;
+        width: 2px;
+        height: 2rem;
+        background-color: #dee2e6;
+        transform: translateX(-50%);
+    }
+    
+    .timeline {
+        position: relative;
+    }
+</style>
+{% endblock %}

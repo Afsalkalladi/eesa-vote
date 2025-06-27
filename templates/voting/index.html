@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Election Header -->
+        <div class="card voting-card mb-4">
+            <div class="card-body text-center">
+                <h1 class="card-title mb-3">
+                    <i class="bi bi-award text-primary me-2"></i>
+                    {{ settings.election_title }}
+                </h1>
+                {% if settings.election_description %}
+                    <p class="card-text text-muted">{{ settings.election_description }}</p>
+                {% endif %}
+                
+                {% if not settings.is_election_active %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        The election system is currently inactive.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Login Form -->
+        {% if not request.session.voter_token %}
+            <div class="card voting-card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">
+                        <i class="bi bi-key text-primary me-2"></i>
+                        Enter Your Voting Token
+                    </h3>
+                    
+                    <form method="post" action="{% url 'login_voter' %}" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="token" class="form-label">Authentication Token</label>
+                            <input type="text" class="form-control form-control-lg" id="token" name="token" 
+                                   placeholder="Enter your unique voting token" required
+                                   pattern="[a-fA-F0-9\-]{36}" title="Please enter a valid token">
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Enter the token provided to you by the election committee
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter a valid authentication token.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="loginBtn">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Login to Vote
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <!-- Already logged in -->
+            <div class="card voting-card mb-4">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-success">
+                        <i class="bi bi-check-circle me-2"></i>
+                        You are logged in!
+                    </h3>
+                    <p class="card-text">Ready to cast your vote?</p>
+                    <a href="{% url 'vote' %}" class="btn btn-success btn-lg">
+                        <i class="bi bi-hand-index me-2"></i>
+                        Go to Voting
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Active Positions Info -->
+        {% if active_positions %}
+            <div class="card voting-card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-list-task text-primary me-2"></i>
+                        Current Voting Positions
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for position in active_positions %}
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <span class="badge bg-success rounded-pill">Active</span>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">{{ position.title }}</h6>
+                                        <small class="text-muted">
+                                            Until: {{ position.end_time|date:"M d, Y H:i" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Election Stats -->
+        <div class="card voting-card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-graph-up text-primary me-2"></i>
+                    Election Statistics
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-item">
+                            <i class="bi bi-people display-4 text-primary"></i>
+                            <h3 class="mt-2">{{ total_voters|default:0 }}</h3>
+                            <p class="text-muted">Registered Voters</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-item">
+                            <i class="bi bi-check2-square display-4 text-success"></i>
+                            <h3 class="mt-2">{{ total_voted|default:0 }}</h3>
+                            <p class="text-muted">Votes Cast</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-item">
+                            <i class="bi bi-trophy display-4 text-warning"></i>
+                            <h3 class="mt-2">{{ active_positions|length }}</h3>
+                            <p class="text-muted">Active Positions</p>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if total_voters > 0 %}
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Voter Turnout</span>
+                            <span class="fw-bold">{{ total_voted|default:0 }}/{{ total_voters }} ({{ turnout_percentage|default:0 }}%)</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" style="width: {{ turnout_percentage|default:0 }}%"></div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card voting-card mt-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-info-circle text-primary me-2"></i>
+                    How to Vote
+                </h4>
+            </div>
+            <div class="card-body">
+                <ol class="list-group list-group-numbered list-group-flush">
+                    <li class="list-group-item d-flex align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Enter Your Token</div>
+                            Use the unique token provided to you by the election committee
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Select Candidates</div>
+                            Choose one candidate for each position you're eligible to vote for
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Submit Your Vote</div>
+                            Review your selections and submit your ballot
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Confirmation</div>
+                            Receive confirmation that your vote has been recorded
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    } else {
+                        // Show loading state
+                        const loginBtn = document.getElementById('loginBtn');
+                        showLoading(loginBtn);
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+    
+    // Auto-format token input
+    document.getElementById('token').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/[^a-fA-F0-9]/g, '');
+        if (value.length > 32) {
+            value = value.substring(0, 32);
+        }
+        
+        // Add hyphens in UUID format
+        if (value.length >= 8) {
+            value = value.substring(0, 8) + '-' + value.substring(8);
+        }
+        if (value.length >= 13) {
+            value = value.substring(0, 13) + '-' + value.substring(13);
+        }
+        if (value.length >= 18) {
+            value = value.substring(0, 18) + '-' + value.substring(18);
+        }
+        if (value.length >= 23) {
+            value = value.substring(0, 23) + '-' + value.substring(23);
+        }
+        
+        e.target.value = value;
+    });
+</script>
+{% endblock %}
