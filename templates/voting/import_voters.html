@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Import Voters{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Import Form -->
+        <div class="card voting-card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-upload text-primary me-2"></i>
+                    Import Voters from CSV
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="csv_file" class="form-label">
+                            <strong>Select CSV File</strong>
+                        </label>
+                        <input type="file" 
+                               class="form-control" 
+                               id="csv_file" 
+                               name="csv_file" 
+                               accept=".csv"
+                               required>
+                        <div class="form-text">
+                            Upload a CSV file with voter information. The file must contain 'name' and 'reg_no' columns.
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/admin/" class="btn btn-outline-secondary me-md-2">
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Back to Admin
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload me-2"></i>
+                            Import Voters
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- CSV Format Guide -->
+        <div class="card voting-card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle text-info me-2"></i>
+                    CSV Format Requirements
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Required Format:</h6>
+                <div class="bg-light p-3 rounded mb-3">
+                    <code>
+                        name,reg_no<br>
+                        John Smith,2021001<br>
+                        Sarah Johnson,2021002<br>
+                        Michael Brown,2021003
+                    </code>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Required Columns:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>name</strong> - Full name of the voter</li>
+                            <li><strong>reg_no</strong> - Unique registration number</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Important Notes:</h6>
+                        <ul class="list-unstyled">
+                            <li>✅ File must be in CSV format</li>
+                            <li>✅ Registration numbers must be unique</li>
+                            <li>✅ Both name and reg_no are required</li>
+                            <li>✅ Tokens are generated automatically</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-download me-2"></i>
+                    <strong>Need a template?</strong> 
+                    <a href="/static/sample_voters.csv" download class="alert-link">
+                        Download sample CSV file
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Statistics -->
+        <div class="card voting-card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-people text-success me-2"></i>
+                    Current Voter Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <h3 class="text-primary mb-1">{{ total_voters }}</h3>
+                            <small class="text-muted">Total Voters</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <h3 class="text-success mb-1">{{ voted_count }}</h3>
+                            <small class="text-muted">Votes Cast</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <h3 class="text-warning mb-1">{{ remaining_count }}</h3>
+                            <small class="text-muted">Not Voted</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card voting-card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning text-warning me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'export_voters_csv' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-download me-2"></i>
+                            Export Voters & Tokens
+                        </a>
+                        <small class="text-muted d-block mt-1">
+                            Download CSV with voter tokens for distribution
+                        </small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="/admin/voting/voter/" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-list me-2"></i>
+                            Manage Voters
+                        </a>
+                        <small class="text-muted d-block mt-1">
+                            View and edit individual voter records
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('csv_file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file && !file.name.toLowerCase().endsWith('.csv')) {
+        alert('Please select a CSV file (.csv extension)');
+        e.target.value = '';
+    }
+});
+</script>
+{% endblock %}

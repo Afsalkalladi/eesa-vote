@@ -56,16 +56,17 @@ def index(request):
     
     # Get active positions for display
     now = timezone.now()
-    active_positions = Position.objects.filter(
-        is_active=True,
-        start_time__lte=now,
-        end_time__gte=now
-    )
+    settings = ElectionSettings.get_settings()
+    active_positions = Position.objects.filter(is_active=True)
+    
+    # Check if voting is globally open
+    is_voting_open = settings.is_voting_open()
     
     context = {
         'settings': settings,
         'active_positions': active_positions,
         'current_time': now,
+        'is_voting_open': is_voting_open,
     }
     
     return render(request, 'voting/index.html', context)
@@ -135,11 +136,20 @@ def vote(request):
     
     # Get active positions with their candidates
     now = timezone.now()
-    positions = Position.objects.filter(
-        is_active=True,
-        start_time__lte=now,
-        end_time__gte=now
-    ).prefetch_related('candidates')
+    settings = ElectionSettings.get_settings()
+    
+    # Check if voting is globally open
+    if not settings.is_voting_open():
+        voting_status = settings.get_voting_status()
+        if voting_status == "Not Started":
+            messages.warning(request, f'Voting has not started yet. Voting begins at {settings.voting_start_time.strftime("%B %d, %Y at %I:%M %p")}.')
+        elif voting_status == "Ended":
+            messages.warning(request, 'Voting has ended.')
+        else:
+            messages.warning(request, 'Voting is not available at this time.')
+        return render(request, 'voting/voting_closed.html', {'settings': settings})
+    
+    positions = Position.objects.filter(is_active=True).prefetch_related('candidates')
     
     if not positions.exists():
         messages.warning(request, 'No active voting positions at this time.')
@@ -412,45 +422,34 @@ def final_results(request):
     total_voters = Voter.objects.count()
     total_voted = Voter.objects.filter(has_voted=True).count()
     
-    # Get all positions to check if voting has ended
-    positions = Position.objects.filter(is_active=True)
+    # Get global voting status
+    settings = ElectionSettings.get_settings()
     now = timezone.now()
     
-    # Check if all voting periods have ended
-    all_voting_ended = True
-    if positions.exists():
-        for position in positions:
-            if not position.is_voting_ended():
-                all_voting_ended = False
-                break
+    # Check if voting has ended globally
+    voting_ended = settings.is_voting_ended()
     
     # Check if all voters have voted
     all_voters_voted = total_voters > 0 and total_voted == total_voters
     
     # Show results only if voting has ended OR all voters have voted
-    can_show_results = all_voting_ended or all_voters_voted
+    can_show_results = voting_ended or all_voters_voted
     
     if not can_show_results:
-        # Calculate time until voting ends
-        next_end_time = None
-        for position in positions:
-            if not position.is_voting_ended():
-                if next_end_time is None or position.end_time < next_end_time:
-                    next_end_time = position.end_time
-        
         context = {
             'can_show_results': False,
-            'all_voting_ended': all_voting_ended,
+            'voting_ended': voting_ended,
             'all_voters_voted': all_voters_voted,
             'total_voters': total_voters,
             'total_voted': total_voted,
-            'next_end_time': next_end_time,
+            'voting_end_time': settings.voting_end_time,
             'current_time': now,
-            'settings': ElectionSettings.get_settings()
+            'settings': settings
         }
         return render(request, 'voting/final_results_restricted.html', context)
     
     # Generate results data
+    positions = Position.objects.filter(is_active=True)
     winners_data = []
     
     for position in positions:
@@ -477,9 +476,9 @@ def final_results(request):
         'winners_data': winners_data,
         'total_voters': total_voters,
         'total_voted': total_voted,
-        'all_voting_ended': all_voting_ended,
+        'voting_ended': voting_ended,
         'all_voters_voted': all_voters_voted,
-        'settings': ElectionSettings.get_settings()
+        'settings': settings
     }
     
     return render(request, 'voting/final_results.html', context)
@@ -608,4 +607,15 @@ def import_voters_csv(request):
         except Exception as e:
             messages.error(request, f'Error importing CSV: {str(e)}')
     
-    return render(request, 'voting/import_voters.html')
+    # Get current voter statistics
+    total_voters = Voter.objects.count()
+    voted_count = Voter.objects.filter(has_voted=True).count()
+    remaining_count = total_voters - voted_count
+    
+    context = {
+        'total_voters': total_voters,
+        'voted_count': voted_count,
+        'remaining_count': remaining_count,
+    }
+    
+    return render(request, 'voting/import_voters.html', context)

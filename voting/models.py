@@ -101,23 +101,23 @@ class Position(models.Model):
             raise ValidationError("End time must be after start time.")
 
     def is_voting_open(self):
-        """Check if voting is currently open for this position."""
-        now = timezone.now()
-        return self.start_time <= now <= self.end_time
+        """Check if voting is currently open (uses global election timing)."""
+        if not self.is_active:
+            return False
+        settings = ElectionSettings.get_settings()
+        return settings.is_voting_open()
 
     def is_voting_ended(self):
-        """Check if voting has ended for this position."""
-        return timezone.now() > self.end_time
+        """Check if voting has ended (uses global election timing)."""
+        settings = ElectionSettings.get_settings()
+        return settings.is_voting_ended()
 
     def get_status(self):
-        """Get the current status of voting for this position."""
-        now = timezone.now()
-        if now < self.start_time:
-            return "Not Started"
-        elif self.start_time <= now <= self.end_time:
-            return "Active"
-        else:
-            return "Ended"
+        """Get the current status of voting (uses global election timing)."""
+        if not self.is_active:
+            return "Inactive"
+        settings = ElectionSettings.get_settings()
+        return settings.get_voting_status()
 
 
 class Candidate(models.Model):
@@ -244,6 +244,16 @@ class ElectionSettings(models.Model):
         blank=True,
         help_text="Email of the technical head who can access audit trails"
     )
+    voting_start_time = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Global voting start time for all positions"
+    )
+    voting_end_time = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Global voting end time for all positions"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -266,6 +276,8 @@ class ElectionSettings(models.Model):
             existing.show_live_results = self.show_live_results
             existing.results_refresh_interval = self.results_refresh_interval
             existing.technical_head_email = self.technical_head_email
+            existing.voting_start_time = self.voting_start_time
+            existing.voting_end_time = self.voting_end_time
             existing.save()
             return existing
         return super().save(*args, **kwargs)
@@ -283,3 +295,34 @@ class ElectionSettings(models.Model):
             }
         )
         return settings
+
+    def is_voting_open(self):
+        """Check if voting is currently open globally."""
+        if not self.voting_start_time or not self.voting_end_time:
+            return False
+        now = timezone.now()
+        return self.voting_start_time <= now <= self.voting_end_time
+
+    def is_voting_ended(self):
+        """Check if voting has ended globally."""
+        if not self.voting_end_time:
+            return False
+        return timezone.now() > self.voting_end_time
+
+    def get_voting_status(self):
+        """Get the current global voting status."""
+        if not self.voting_start_time or not self.voting_end_time:
+            return "Not Configured"
+        now = timezone.now()
+        if now < self.voting_start_time:
+            return "Not Started"
+        elif self.voting_start_time <= now <= self.voting_end_time:
+            return "Active"
+        else:
+            return "Ended"
+
+    def clean(self):
+        """Validate that voting end time is after start time."""
+        if self.voting_start_time and self.voting_end_time:
+            if self.voting_end_time <= self.voting_start_time:
+                raise ValidationError("Voting end time must be after start time.")

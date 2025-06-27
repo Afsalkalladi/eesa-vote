@@ -27,6 +27,10 @@ class ElectionSettingsAdmin(admin.ModelAdmin):
         ('Election Information', {
             'fields': ('election_title', 'election_description')
         }),
+        ('Global Voting Schedule', {
+            'fields': ('voting_start_time', 'voting_end_time'),
+            'description': 'Set the global voting times for all positions. Individual position times are no longer used.'
+        }),
         ('Election Control', {
             'fields': ('is_election_active', 'show_live_results', 'results_refresh_interval')
         }),
@@ -107,11 +111,9 @@ class PositionAdmin(admin.ModelAdmin):
         'get_status', 
         'candidate_count', 
         'vote_count',
-        'start_time', 
-        'end_time',
         'is_active'
     ]
-    list_filter = ['is_active', 'start_time', 'end_time']
+    list_filter = ['is_active']
     search_fields = ['title', 'description']
     ordering = ['title']
     
@@ -119,8 +121,14 @@ class PositionAdmin(admin.ModelAdmin):
         ('Position Information', {
             'fields': ('title', 'description', 'is_active')
         }),
-        ('Voting Schedule', {
-            'fields': ('start_time', 'end_time')
+        ('Note', {
+            'fields': (),
+            'description': 'Voting times are set globally in Election Settings. Individual position timing is no longer used.'
+        }),
+        ('Individual Timing (Legacy - Not Used)', {
+            'fields': ('start_time', 'end_time'),
+            'classes': ('collapse',),
+            'description': 'These fields are kept for backward compatibility but are not used. Use Election Settings for global timing.'
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),

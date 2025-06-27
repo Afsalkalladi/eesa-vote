@@ -22,18 +22,18 @@
                 
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <div class="condition-card p-3 border rounded {% if all_voting_ended %}bg-success text-white{% else %}bg-light{% endif %}">
+                        <div class="condition-card p-3 border rounded {% if voting_ended %}bg-success text-white{% else %}bg-light{% endif %}">
                             <h5>
                                 <i class="bi bi-clock-fill me-2"></i>
                                 Voting Period Ends
                             </h5>
                             <p class="mb-0">
-                                {% if all_voting_ended %}
-                                    ✅ All voting periods have ended
+                                {% if voting_ended %}
+                                    ✅ Voting period has ended
                                 {% else %}
                                     ⏳ Voting is still active
-                                    {% if next_end_time %}
-                                        <br><small>Next deadline: {{ next_end_time|date:"M d, Y H:i" }}</small>
+                                    {% if voting_end_time %}
+                                        <br><small>Deadline: {{ voting_end_time|date:"M d, Y H:i" }}</small>
                                     {% endif %}
                                 {% endif %}
                             </p>
@@ -127,16 +127,16 @@
                         <h6>Time Information</h6>
                         <ul class="list-unstyled">
                             <li><strong>Current Time:</strong> {{ current_time|date:"M d, Y H:i" }}</li>
-                            {% if next_end_time %}
-                                <li><strong>Next Voting Deadline:</strong> {{ next_end_time|date:"M d, Y H:i" }}</li>
-                                {% if not all_voting_ended %}
+                            {% if voting_end_time %}
+                                <li><strong>Voting Deadline:</strong> {{ voting_end_time|date:"M d, Y H:i" }}</li>
+                                {% if not voting_ended %}
                                     <li><strong>Time Remaining:</strong> 
                                         <span id="countdown" class="text-primary"></span>
                                     </li>
                                 {% endif %}
                             {% endif %}
-                            <li><strong>All Voting Ended:</strong> 
-                                {% if all_voting_ended %}
+                            <li><strong>Voting Ended:</strong> 
+                                {% if voting_ended %}
                                     <span class="text-success">✅ Yes</span>
                                 {% else %}
                                     <span class="text-warning">⏳ No</span>
@@ -181,8 +181,8 @@
     }
     
     // Countdown timer (if voting is still active)
-    {% if next_end_time and not all_voting_ended %}
-        const endTime = new Date('{{ next_end_time|date:"c" }}');
+    {% if voting_end_time and not voting_ended %}
+        const endTime = new Date('{{ voting_end_time|date:"c" }}');
         
         function updateCountdown() {
             const now = new Date();
