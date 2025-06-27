@@ -36,6 +36,8 @@ A secure, token-based online election system built for the Electrical Engineerin
 - Python 3.8+
 - Django 5.2+
 - Pillow (for image handling)
+- **Development**: SQLite (included with Python)
+- **Production**: PostgreSQL (required)
 
 ### Installation
 
@@ -302,6 +304,73 @@ vote/
 - Implement caching for results pages
 - Optimize image uploads
 - Consider CDN for static files
+
+## 🌐 Deployment
+
+### Free Hosting on Render
+
+This project is ready for deployment on [Render](https://render.com), a free hosting platform.
+
+**Quick Deployment Steps:**
+
+1. **Push to GitHub** (if not already done):
+
+   ```bash
+   git init
+   git add .
+   git commit -m "EESA Election System ready for deployment"
+   git remote add origin https://github.com/yourusername/your-repo-name.git
+   git push -u origin main
+   ```
+
+2. **Deploy on Render**:
+
+   - Sign up at [render.com](https://render.com)
+   - **Create PostgreSQL database first** (required for production)
+   - Create a new Web Service
+   - Connect your GitHub repository
+   - Use these settings:
+     - **Build Command**: `./build.sh`
+     - **Start Command**: `gunicorn election_system.wsgi:application --bind 0.0.0.0:$PORT`
+     - **Environment Variables**:
+       - `DJANGO_SETTINGS_MODULE`: `election_system.production_settings`
+       - `DATABASE_URL`: [PostgreSQL URL from database] **REQUIRED**
+       - `SECRET_KEY`: Generate using `python generate_secret_key.py`
+
+3. **Post-deployment**:
+   - Access admin at: `https://your-app.onrender.com/admin/`
+   - Default admin: username=`admin`, password=`admin123`
+   - **⚠️ Change the admin password immediately!**
+
+For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+### Live Demo
+
+Once deployed, your application will include:
+
+- **Public Voting**: `https://your-app.onrender.com/`
+- **Live Results**: `https://your-app.onrender.com/live-results/`
+- **Final Results**: `https://your-app.onrender.com/final-results/`
+- **Admin Panel**: `https://your-app.onrender.com/admin/`
+
+## 🔧 Development
+
+### Local Development
+
+- Use Docker for consistent development environments
+- Run `docker-compose up` to start services
+- Access the app at `http://localhost:8000/`
+
+### Testing
+
+- Run tests with `python manage.py test`
+- Use `pytest` for advanced testing features
+
+### Troubleshooting
+
+- Check Docker container logs for errors
+- Ensure all environment variables are set
+- Verify database connections and migrations
 
 ## 🤝 Contributing
 
