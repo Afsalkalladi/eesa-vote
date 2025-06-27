@@ -365,6 +365,7 @@ def live_results(request):
         'results_data': results_data,
         'total_voters': total_voters,
         'total_voted': total_voted,
+        'pending_voters': total_voters - total_voted,
         'settings': settings,
         'current_time': timezone.now()
     }
