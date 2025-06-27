@@ -208,6 +208,15 @@ def submit_vote(request):
     if voter.has_voted:
         return JsonResponse({'success': False, 'error': 'You have already voted'})
     
+    # Check if voting is still globally open
+    settings = ElectionSettings.get_settings()
+    if not settings.is_voting_open():
+        return JsonResponse({
+            'success': False, 
+            'error': 'Voting has ended. Your vote cannot be processed.',
+            'voting_ended': True
+        })
+    
     # Get current time and client IP
     now = timezone.now()
     client_ip = get_client_ip(request)
@@ -330,6 +339,21 @@ def live_results(request):
     results_data = []
     total_voters = Voter.objects.count()
     total_voted = Voter.objects.filter(has_voted=True).count()
+    pending_voters = total_voters - total_voted
+    
+    # Check if election has ended
+    now = timezone.now()
+    voting_ended_by_time = settings.is_voting_ended()
+    all_voters_voted = total_voters > 0 and total_voted == total_voters
+    election_ended = voting_ended_by_time or all_voters_voted
+    
+    # Determine end reason
+    end_reason = None
+    if election_ended:
+        if all_voters_voted:
+            end_reason = "All eligible voters have cast their votes"
+        elif voting_ended_by_time:
+            end_reason = "Voting time period has ended"
     
     for position in positions:
         candidates_data = []
@@ -365,7 +389,11 @@ def live_results(request):
         'results_data': results_data,
         'total_voters': total_voters,
         'total_voted': total_voted,
-        'pending_voters': total_voters - total_voted,
+        'pending_voters': pending_voters,
+        'election_ended': election_ended,
+        'end_reason': end_reason,
+        'voting_ended_by_time': voting_ended_by_time,
+        'all_voters_voted': all_voters_voted,
         'settings': settings,
         'current_time': timezone.now()
     }
@@ -386,6 +414,23 @@ def live_results_api(request):
     # Get results data
     positions = Position.objects.filter(is_active=True)
     results = []
+    
+    total_voters = Voter.objects.count()
+    total_voted = Voter.objects.filter(has_voted=True).count()
+    
+    # Check if election has ended
+    now = timezone.now()
+    voting_ended_by_time = settings.is_voting_ended()
+    all_voters_voted = total_voters > 0 and total_voted == total_voters
+    election_ended = voting_ended_by_time or all_voters_voted
+    
+    # Determine end reason
+    end_reason = None
+    if election_ended:
+        if all_voters_voted:
+            end_reason = "All eligible voters have cast their votes"
+        elif voting_ended_by_time:
+            end_reason = "Voting time period has ended"
     
     for position in positions:
         candidates_data = []
@@ -418,8 +463,12 @@ def live_results_api(request):
     
     return JsonResponse({
         'results': results,
-        'total_voters': Voter.objects.count(),
-        'total_voted': Voter.objects.filter(has_voted=True).count(),
+        'total_voters': total_voters,
+        'total_voted': total_voted,
+        'election_ended': election_ended,
+        'end_reason': end_reason,
+        'voting_ended_by_time': voting_ended_by_time,
+        'all_voters_voted': all_voters_voted,
         'timestamp': timezone.now().isoformat()
     })
 
@@ -510,11 +559,11 @@ def is_technical_head(user):
     )
 
 
-@user_passes_test(is_technical_head)
+@staff_member_required
 def audit_trail(request):
     """
-    Audit trail view - restricted to technical head only.
-    Shows detailed voting information for fraud detection.
+    Audit trail view - restricted to staff users only.
+    Shows detailed voting information for fraud detection and election oversight.
     """
     votes = Vote.objects.select_related(
         'voter', 'position', 'candidate'
@@ -539,7 +588,7 @@ def audit_trail(request):
         'positions': Position.objects.filter(is_active=True),
         'position_filter': position_filter,
         'voter_filter': voter_filter,
-        'total_votes': votes.count()
+        'total_votes': votes.count(),
     }
     
     return render(request, 'voting/audit_trail.html', context)
@@ -630,3 +679,28 @@ def import_voters_csv(request):
     }
     
     return render(request, 'voting/import_voters.html', context)
+
+
+def audit_required(view_func):
+    """
+    Decorator to check if user is authenticated for audit access.
+    """
+    def wrapper(request, *args, **kwargs):
+        if not request.session.get('audit_authenticated'):
+            messages.warning(request, 'Audit authentication required.')
+            return redirect('audit_login')
+        
+        # Check session timeout (2 hours)
+        login_time_str = request.session.get('audit_login_time')
+        if login_time_str:
+            from django.utils.dateparse import parse_datetime
+            login_time = parse_datetime(login_time_str)
+            if login_time and (timezone.now() - login_time).total_seconds() > 7200:  # 2 hours
+                # Session expired
+                request.session.flush()
+                messages.warning(request, 'Audit session expired. Please login again.')
+                return redirect('audit_login')
+        
+        return view_func(request, *args, **kwargs)
+    
+    return wrapper

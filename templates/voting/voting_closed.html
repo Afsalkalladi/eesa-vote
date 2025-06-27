@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Voting Closed{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <!-- Modern Status Card -->
+        <div class="card" style="border: none; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); overflow: hidden; background: white;">
+            
+            <!-- Clean Header -->
+            <div class="text-center" style="background: linear-gradient(135deg, #1a365d 0%, #ef4444 100%); color: white; padding: 2rem; position: relative;">
+                
+                <!-- Main Icon -->
+                <div class="mb-3">
+                    <div class="d-inline-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.2); border: 3px solid var(--eesa-gold); border-radius: 50%; width: 70px; height: 70px;">
+                        <i class="bi bi-lock-fill" style="font-size: 1.8rem; color: var(--eesa-gold);"></i>
+                    </div>
+                </div>
+                
+                <!-- Title -->
+                <h1 style="font-weight: 700; font-size: 1.8rem; margin-bottom: 0.5rem;">
+                    Voting Closed
+                </h1>
+                <p style="font-size: 0.95rem; opacity: 0.9; margin: 0;">
+                    EESA Election voting period has concluded
+                </p>
+            </div>
+            
+            <!-- Content Body -->
+            <div class="card-body p-4">
+                {% if settings.is_voting_ended %}
+                    <!-- Election Complete State -->
+                    <div class="text-center mb-4">
+                        <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; border-radius: 16px; padding: 1.5rem;">
+                            <!-- Success Icon -->
+                            <div class="mb-3">
+                                <div class="d-inline-flex align-items-center justify-content-center" style="background: #10b981; border-radius: 50%; width: 56px; height: 56px;">
+                                    <i class="bi bi-check-circle-fill" style="font-size: 1.5rem; color: white;"></i>
+                                </div>
+                            </div>
+                            
+                            <h3 style="color: #065f46; font-weight: 700; margin-bottom: 1rem; font-size: 1.2rem;">
+                                🎉 Election Successfully Completed!
+                            </h3>
+                            <p style="color: #374151; margin-bottom: 1.5rem; font-size: 0.9rem; line-height: 1.6;">
+                                All votes have been securely counted and verified.<br>
+                                Official results are now available for viewing.
+                            </p>
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                                <a href="{% url 'final_results' %}" class="btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 10px; padding: 0.7rem 1.8rem; font-weight: 600; text-decoration: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">
+                                    <i class="bi bi-trophy-fill me-2"></i>View Final Results
+                                </a>
+                                <a href="{% url 'live_results' %}" class="btn" style="background: white; color: #10b981; border: 2px solid #10b981; border-radius: 10px; padding: 0.7rem 1.8rem; font-weight: 600; text-decoration: none;">
+                                    <i class="bi bi-bar-chart-line me-2"></i>Live Results
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Voting Not Started State -->
+                    <div class="text-center mb-4">
+                        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 16px; padding: 1.5rem;">
+                            <!-- Waiting Icon -->
+                            <div class="mb-3">
+                                <div class="d-inline-flex align-items-center justify-content-center" style="background: #f59e0b; border-radius: 50%; width: 56px; height: 56px;">
+                                    <i class="bi bi-hourglass-split" style="font-size: 1.5rem; color: white;"></i>
+                                </div>
+                            </div>
+                            
+                            <h3 style="color: #92400e; font-weight: 700; margin-bottom: 1rem; font-size: 1.2rem;">
+                                ⏰ Voting Period Upcoming
+                            </h3>
+                            <p style="color: #374151; margin-bottom: 1rem; font-size: 0.9rem;">
+                                The EESA election voting will begin on:
+                            </p>
+                            
+                            <!-- Date Display -->
+                            <div style="background: white; border-radius: 10px; padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <h4 style="color: var(--eesa-primary); font-weight: 700; margin-bottom: 0.5rem; font-size: 1.1rem;">
+                                    {{ settings.voting_start_time|date:"F d, Y" }}
+                                </h4>
+                                <p style="color: #6b7280; margin: 0; font-size: 1rem; font-weight: 600;">
+                                    {{ settings.voting_start_time|date:"g:i A" }}
+                                </p>
+                            </div>
+                            
+                            <a href="{% url 'index' %}" class="btn" style="background: linear-gradient(135deg, var(--eesa-primary) 0%, var(--eesa-accent) 100%); color: white; border: none; border-radius: 10px; padding: 0.7rem 1.8rem; font-weight: 600; text-decoration: none; box-shadow: 0 2px 8px rgba(26, 54, 93, 0.3);">
+                                <i class="bi bi-house-fill me-2"></i>Return to Homepage
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- Enhanced Election Information -->
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 16px; padding: 1.5rem; border: 1px solid #cbd5e1;">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="d-flex align-items-center justify-content-center me-3" style="background: var(--eesa-primary); border-radius: 50%; width: 40px; height: 40px;">
+                            <i class="bi bi-info-circle-fill" style="font-size: 1.2rem; color: white;"></i>
+                        </div>
+                        <h5 style="color: var(--eesa-primary); font-weight: 700; margin: 0; font-size: 1.1rem;">
+                            Election Details
+                        </h5>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div style="background: white; border-radius: 8px; padding: 1rem; border-left: 4px solid var(--eesa-gold);">
+                                <h6 style="color: var(--eesa-primary); font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">Title</h6>
+                                <p style="margin: 0; font-size: 0.85rem; color: #374151;">{{ settings.election_title }}</p>
+                            </div>
+                            {% if settings.election_description %}
+                            <div class="mt-2" style="background: white; border-radius: 8px; padding: 1rem; border-left: 4px solid var(--eesa-accent);">
+                                <h6 style="color: var(--eesa-primary); font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">Description</h6>
+                                <p style="margin: 0; font-size: 0.85rem; color: #374151;">{{ settings.election_description }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {% if settings.voting_start_time %}
+                            <div style="background: white; border-radius: 8px; padding: 1rem; border-left: 4px solid #10b981;">
+                                <h6 style="color: var(--eesa-primary); font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">Start Time</h6>
+                                <p style="margin: 0; font-size: 0.85rem; color: #374151;">{{ settings.voting_start_time|date:"M d, Y g:i A" }}</p>
+                            </div>
+                            {% endif %}
+                            {% if settings.voting_end_time %}
+                            <div class="mt-2" style="background: white; border-radius: 8px; padding: 1rem; border-left: 4px solid #ef4444;">
+                                <h6 style="color: var(--eesa-primary); font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">End Time</h6>
+                                <p style="margin: 0; font-size: 0.85rem; color: #374151;">{{ settings.voting_end_time|date:"M d, Y g:i A" }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Hover Effects -->
+<style>
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+</style>
+{% endblock %}

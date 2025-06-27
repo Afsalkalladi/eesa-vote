@@ -6,22 +6,24 @@
 <div class="row">
     <div class="col-12">
         <!-- Professional Header -->
-        <div class="card voting-card mb-4" style="background: linear-gradient(135deg, var(--eesa-primary) 0%, var(--eesa-accent) 100%); color: white;">
-            <div class="card-body text-center py-5">
-                <div class="mb-4">
-                    <i class="bi bi-award" style="font-size: 4rem; color: var(--eesa-gold);"></i>
+        <div class="card voting-card mb-3" style="background: linear-gradient(135deg, var(--eesa-primary) 0%, var(--eesa-accent) 100%); color: white;">
+            <div class="card-body text-center py-3">
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="d-flex align-items-center justify-content-center me-3" style="background: var(--eesa-gold); border-radius: 50%; width: 48px; height: 48px; flex-shrink: 0;">
+                        <i class="bi bi-award" style="font-size: 1.5rem; color: var(--eesa-primary); line-height: 1;"></i>
+                    </div>
+                    <h1 class="card-title mb-0" style="font-weight: 700; font-size: 1.8rem;">
+                        EESA Election Results
+                    </h1>
                 </div>
-                <h1 class="card-title mb-3" style="font-weight: 700; font-size: 2.5rem;">
-                    EESA Election Results
-                </h1>
-                <p class="card-text mb-4" style="font-size: 1.2rem; opacity: 0.9;">
+                <p class="card-text mb-2" style="font-size: 0.95rem; opacity: 0.9;">
                     Electrical Engineering Students Association<br>
                     <strong>Official Final Results - Student Council Elections 2025</strong>
                 </p>
                 
                 <!-- Results Status Badge -->
-                <div class="badge" style="background: var(--eesa-gold); color: var(--eesa-primary); font-size: 1rem; padding: 0.75rem 1.5rem;">
-                    <i class="bi bi-check-circle me-2"></i>
+                <div class="badge" style="background: var(--eesa-gold); color: var(--eesa-primary); font-size: 0.8rem; padding: 0.4rem 1rem;">
+                    <i class="bi bi-check-circle me-1" style="font-size: 0.7rem;"></i>
                     {% if all_voting_ended and all_voters_voted %}
                         Complete Election Results
                     {% elif all_voting_ended %}
@@ -34,51 +36,51 @@
         </div>
 
         <!-- Professional Statistics Dashboard -->
-        <div class="card voting-card mb-5">
-            <div class="card-header" style="background: white; border-bottom: 3px solid var(--eesa-accent);">
-                <h4 class="mb-0" style="color: var(--eesa-primary); font-weight: 600;">
-                    <i class="bi bi-graph-up me-2"></i>
+        <div class="card voting-card mb-3">
+            <div class="card-header" style="background: white; border-bottom: 2px solid var(--eesa-accent); padding: 0.75rem 1rem;">
+                <h5 class="mb-0" style="color: var(--eesa-primary); font-weight: 600; font-size: 1rem;">
+                    <i class="bi bi-graph-up me-1" style="font-size: 0.9rem;"></i>
                     Election Statistics Summary
-                </h4>
+                </h5>
             </div>
-            <div class="card-body p-4">
-                <div class="row g-4">
+            <div class="card-body p-3">
+                <div class="row g-3">
                     <div class="col-md-4">
-                        <div class="stat-item" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-left: 4px solid var(--eesa-primary);">
+                        <div class="stat-item" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-left: 3px solid var(--eesa-primary); padding: 1rem; border-radius: 8px;">
                             <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="bi bi-people-fill" style="font-size: 2.5rem; color: var(--eesa-primary);"></i>
+                                <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--eesa-primary); border-radius: 50%; width: 36px; height: 36px; flex-shrink: 0;">
+                                    <i class="bi bi-people-fill" style="font-size: 1.1rem; color: white; line-height: 1;"></i>
                                 </div>
                                 <div>
-                                    <h2 class="mb-0" style="color: var(--eesa-primary); font-weight: 700;">{{ total_voters }}</h2>
-                                    <p class="text-muted mb-0 fw-semibold">Registered Voters</p>
+                                    <h4 class="mb-0" style="color: var(--eesa-primary); font-weight: 700; font-size: 1.5rem;">{{ total_voters }}</h4>
+                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.8rem;">Registered Voters</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="stat-item" style="background: linear-gradient(135deg, #f0fff4 0%, #dcfce7 100%); border-left: 4px solid var(--success-color);">
+                        <div class="stat-item" style="background: linear-gradient(135deg, #f0fff4 0%, #dcfce7 100%); border-left: 3px solid var(--success-color); padding: 1rem; border-radius: 8px;">
                             <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="bi bi-check-circle-fill" style="font-size: 2.5rem; color: var(--success-color);"></i>
+                                <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--success-color); border-radius: 50%; width: 36px; height: 36px; flex-shrink: 0;">
+                                    <i class="bi bi-check-circle-fill" style="font-size: 1.1rem; color: white; line-height: 1;"></i>
                                 </div>
                                 <div>
-                                    <h2 class="mb-0" style="color: var(--success-color); font-weight: 700;">{{ total_voted }}</h2>
-                                    <p class="text-muted mb-0 fw-semibold">Votes Cast</p>
+                                    <h4 class="mb-0" style="color: var(--success-color); font-weight: 700; font-size: 1.5rem;">{{ total_voted }}</h4>
+                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.8rem;">Votes Cast</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="stat-item" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 4px solid var(--eesa-gold);">
+                        <div class="stat-item" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 3px solid var(--eesa-gold); padding: 1rem; border-radius: 8px;">
                             <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="bi bi-trophy-fill" style="font-size: 2.5rem; color: var(--eesa-gold);"></i>
+                                <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--eesa-gold); border-radius: 50%; width: 36px; height: 36px; flex-shrink: 0;">
+                                    <i class="bi bi-trophy-fill" style="font-size: 1.1rem; color: var(--eesa-primary); line-height: 1;"></i>
                                 </div>
                                 <div>
                                     {% widthratio total_voted total_voters 100 as turnout %}
-                                    <h2 class="mb-0" style="color: var(--eesa-gold); font-weight: 700;">{{ turnout|default:0 }}%</h2>
-                                    <p class="text-muted mb-0 fw-semibold">Voter Turnout</p>
+                                    <h4 class="mb-0" style="color: var(--eesa-gold); font-weight: 700; font-size: 1.5rem;">{{ turnout|default:0 }}%</h4>
+                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.8rem;">Voter Turnout</p>
                                 </div>
                             </div>
                         </div>
@@ -89,36 +91,36 @@
 
         <!-- Winners Section -->
         {% for winner_data in winners_data %}
-            <div class="card voting-card mb-5">
+            <div class="card voting-card mb-3">
                 <!-- Professional Position Header -->
-                <div class="card-header" style="background: linear-gradient(135deg, var(--eesa-primary) 0%, var(--eesa-accent) 100%); color: white;">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--eesa-primary) 0%, var(--eesa-accent) 100%); color: white; padding: 0.75rem 1rem;">
                     <div class="d-flex align-items-center justify-content-between">
-                        <h3 class="mb-0 d-flex align-items-center">
-                            <i class="bi bi-award me-3" style="font-size: 1.5rem; color: var(--eesa-gold);"></i>
+                        <h4 class="mb-0 d-flex align-items-center" style="font-size: 1.1rem;">
+                            <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--eesa-gold); border-radius: 50%; width: 28px; height: 28px; flex-shrink: 0;">
+                                <i class="bi bi-award" style="font-size: 0.9rem; color: var(--eesa-primary); line-height: 1;"></i>
+                            </div>
                             {{ winner_data.position.title }}
-                        </h3>
-                        <div class="badge" style="background: var(--eesa-gold); color: var(--eesa-primary); font-size: 0.9rem; padding: 0.5rem 1rem;">
-                            <i class="bi bi-trophy me-1"></i>Winner Declared
+                        </h4>
+                        <div class="badge" style="background: var(--eesa-gold); color: var(--eesa-primary); font-size: 0.75rem; padding: 0.3rem 0.6rem;">
+                            <i class="bi bi-trophy me-1" style="font-size: 0.7rem;"></i>Winner Declared
                         </div>
                     </div>
                 </div>
                 
-                <div class="card-body p-4">
+                <div class="card-body p-3">
                     <!-- Professional Winner Display -->
-                    <div class="winner-highlight mb-4" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 3px solid var(--eesa-gold); border-radius: 16px; position: relative; overflow: hidden;">
-                        <div class="p-4">
+                    <div class="winner-highlight mb-3" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 2px solid var(--eesa-gold); border-radius: 12px; position: relative; overflow: hidden;">
+                        <div class="p-3">
                             <div class="row align-items-center">
                                 <div class="col-md-8">
                                     <div class="d-flex align-items-center">
-                                        <div class="me-4">
-                                            <div style="background: var(--eesa-gold); border-radius: 50%; padding: 1rem; display: inline-block;">
-                                                <i class="bi bi-trophy" style="font-size: 2.5rem; color: var(--eesa-primary);"></i>
-                                            </div>
+                                        <div class="d-flex align-items-center justify-content-center me-3" style="background: var(--eesa-gold); border-radius: 50%; width: 48px; height: 48px; flex-shrink: 0;">
+                                            <i class="bi bi-trophy" style="font-size: 1.3rem; color: var(--eesa-primary); line-height: 1;"></i>
                                         </div>
                                         <div>
-                                            <h1 class="mb-2" style="color: var(--eesa-primary); font-weight: 700; font-size: 2.2rem;">{{ winner_data.winner_name }}</h1>
-                                            <p class="mb-1 fs-5" style="color: var(--text-secondary); font-weight: 500;">{{ winner_data.winner_reg_no }}</p>
-                                            <div class="badge" style="background: var(--eesa-primary); color: white; font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                                            <h2 class="mb-1" style="color: var(--eesa-primary); font-weight: 700; font-size: 1.5rem;">{{ winner_data.winner_name }}</h2>
+                                            <p class="mb-1" style="color: var(--text-secondary); font-weight: 500; font-size: 0.9rem;">{{ winner_data.winner_reg_no }}</p>
+                                            <div class="badge" style="background: var(--eesa-primary); color: white; font-size: 0.7rem; padding: 0.3rem 0.6rem;">
                                                 {{ winner_data.position.title }} • Elected
                                             </div>
                                         </div>
@@ -126,12 +128,12 @@
                                 </div>
                                 <div class="col-md-4 text-end">
                                     <div class="text-center">
-                                        <div style="background: var(--eesa-primary); color: white; border-radius: 12px; padding: 1.5rem; display: inline-block; min-width: 150px;">
-                                            <h1 class="mb-2" style="color: var(--eesa-gold); font-weight: 700; font-size: 3rem;">{{ winner_data.votes }}</h1>
-                                            <p class="mb-1" style="font-size: 1rem; opacity: 0.9;">Total Votes</p>
+                                        <div style="background: var(--eesa-primary); color: white; border-radius: 8px; padding: 1rem; display: inline-block; min-width: 120px;">
+                                            <h2 class="mb-1" style="color: var(--eesa-gold); font-weight: 700; font-size: 1.8rem;">{{ winner_data.votes }}</h2>
+                                            <p class="mb-1" style="font-size: 0.8rem; opacity: 0.9;">Total Votes</p>
                                             {% if winner_data.total_votes > 0 %}
                                                 {% widthratio winner_data.votes winner_data.total_votes 100 as win_percentage %}
-                                                <div class="badge" style="background: var(--eesa-gold); color: var(--eesa-primary); font-size: 0.9rem;">
+                                                <div class="badge" style="background: var(--eesa-gold); color: var(--eesa-primary); font-size: 0.7rem;">
                                                     {{ win_percentage }}% of {{ winner_data.total_votes }}
                                                 </div>
                                             {% endif %}
@@ -144,60 +146,60 @@
 
                     <!-- Professional Detailed Results -->
                     <div class="accordion" id="accordion{{ forloop.counter }}">
-                        <div class="accordion-item" style="border: 2px solid var(--eesa-accent); border-radius: 12px;">
+                        <div class="accordion-item" style="border: 1px solid var(--eesa-accent); border-radius: 8px;">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                         data-bs-target="#collapse{{ forloop.counter }}" 
-                                        style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: var(--eesa-primary); font-weight: 600; border-radius: 12px;">
-                                    <i class="bi bi-bar-chart-fill me-2"></i>
+                                        style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: var(--eesa-primary); font-weight: 600; border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.9rem;">
+                                    <i class="bi bi-bar-chart-fill me-2" style="font-size: 0.8rem;"></i>
                                     View Complete Vote Breakdown
                                 </button>
                             </h2>
                             <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" 
                                  data-bs-parent="#accordion{{ forloop.counter }}">
-                                <div class="accordion-body p-4" style="background: #f8fafc;">
-                                    <h5 class="mb-4" style="color: var(--eesa-primary); font-weight: 600;">
-                                        <i class="bi bi-list-ol me-2"></i>
+                                <div class="accordion-body p-3" style="background: #f8fafc;">
+                                    <h6 class="mb-3" style="color: var(--eesa-primary); font-weight: 600; font-size: 0.9rem;">
+                                        <i class="bi bi-list-ol me-1" style="font-size: 0.8rem;"></i>
                                         Complete Results - {{ winner_data.position.title }}
-                                    </h5>
+                                    </h6>
                                     
                                     {% for candidate in winner_data.all_candidates %}
-                                        <div class="candidate-result-final mb-4 p-4 border rounded-3
-                                            {% if forloop.first %}border-3" style="border-color: var(--eesa-gold) !important; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);{% else %}" style="background: white; border-color: #e2e8f0 !important;{% endif %}">
+                                        <div class="candidate-result-final mb-2 p-2 border rounded-2
+                                            {% if forloop.first %}border-2" style="border-color: var(--eesa-gold) !important; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);{% else %}" style="background: white; border-color: #e2e8f0 !important;{% endif %}">
                                             <div class="row align-items-center">
                                                 <div class="col-md-6">
                                                     <div class="d-flex align-items-center">
                                                         {% if forloop.first %}
-                                                            <div class="me-3" style="background: var(--eesa-gold); border-radius: 50%; padding: 0.5rem; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px;">
-                                                                <i class="bi bi-trophy" style="color: var(--eesa-primary); font-size: 1.2rem;"></i>
+                                                            <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--eesa-gold); border-radius: 50%; width: 32px; height: 32px; flex-shrink: 0;">
+                                                                <i class="bi bi-trophy" style="color: var(--eesa-primary); font-size: 0.9rem; line-height: 1;"></i>
                                                             </div>
                                                         {% else %}
-                                                            <div class="me-3" style="background: var(--eesa-primary); border-radius: 50%; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                                                            <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--eesa-primary); border-radius: 50%; color: white; width: 32px; height: 32px; font-weight: 600; font-size: 0.8rem; flex-shrink: 0;">
                                                                 {{ forloop.counter }}
                                                             </div>
                                                         {% endif %}
                                                         <div>
-                                                            <h6 class="mb-0">{{ candidate.candidate__name }}</h6>
-                                                            <small class="text-muted">{{ candidate.candidate__reg_no }}</small>
+                                                            <h6 class="mb-0" style="font-size: 0.9rem;">{{ candidate.candidate__name }}</h6>
+                                                            <small class="text-muted" style="font-size: 0.75rem;">{{ candidate.candidate__reg_no }}</small>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <h5 class="mb-0 text-primary">{{ candidate.vote_count }}</h5>
-                                                    <small class="text-muted">votes</small>
+                                                    <h6 class="mb-0 text-primary" style="font-size: 1rem;">{{ candidate.vote_count }}</h6>
+                                                    <small class="text-muted" style="font-size: 0.75rem;">votes</small>
                                                 </div>
                                                 <div class="col-md-3">
                                                     {% if winner_data.total_votes > 0 %}
                                                         {% widthratio candidate.vote_count winner_data.total_votes 100 as percentage %}
-                                                        <div class="progress" style="height: 8px; border-radius: 4px;">
+                                                        <div class="progress" style="height: 6px; border-radius: 3px;">
                                                             <div class="progress-bar 
                                                                 {% if forloop.first %}bg-warning{% else %}bg-primary{% endif %}" 
                                                                  role="progressbar"
-                                                                 style="width: {{ percentage }}%; border-radius: 4px;"
+                                                                 style="width: {{ percentage }}%; border-radius: 3px;"
                                                                  aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100">
                                                             </div>
                                                         </div>
-                                                        <small class="text-muted mt-1">{{ percentage }}%</small>
+                                                        <small class="text-muted mt-1" style="font-size: 0.7rem;">{{ percentage }}%</small>
                                                     {% else %}
                                                         <div class="progress" style="height: 8px; border-radius: 4px;">
                                                             <div class="progress-bar bg-secondary" 
@@ -220,14 +222,16 @@
             </div>
         {% empty %}
             <div class="card voting-card">
-                <div class="card-body text-center py-5">
-                    <i class="bi bi-hourglass display-1 text-muted"></i>
-                    <h3 class="mt-3 text-muted">Results Not Available</h3>
-                    <p class="text-muted">
+                <div class="card-body text-center py-4">
+                    <div class="d-flex align-items-center justify-content-center mb-3" style="background: var(--text-secondary); border-radius: 50%; width: 64px; height: 64px; margin: 0 auto; opacity: 0.5;">
+                        <i class="bi bi-hourglass" style="font-size: 1.8rem; color: white; line-height: 1;"></i>
+                    </div>
+                    <h4 class="mt-2 text-muted" style="font-size: 1.2rem;">Results Not Available</h4>
+                    <p class="text-muted" style="font-size: 0.9rem;">
                         Final results will be available after all voting periods have ended.
                     </p>
-                    <a href="{% url 'live_results' %}" class="btn btn-primary">
-                        <i class="bi bi-bar-chart me-2"></i>
+                    <a href="{% url 'live_results' %}" class="btn btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                        <i class="bi bi-bar-chart me-1" style="font-size: 0.8rem;"></i>
                         View Live Results
                     </a>
                 </div>
@@ -236,17 +240,17 @@
 
         <!-- Election Information -->
         <div class="card voting-card">
-            <div class="card-header">
-                <h4 class="mb-0">
-                    <i class="bi bi-info-circle text-primary me-2"></i>
+            <div class="card-header" style="padding: 0.75rem 1rem;">
+                <h5 class="mb-0" style="font-size: 1rem;">
+                    <i class="bi bi-info-circle text-primary me-1" style="font-size: 0.9rem;"></i>
                     Election Information
-                </h4>
+                </h5>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="padding: 1rem;">
                 <div class="row">
                     <div class="col-md-6">
-                        <h6>Election Details</h6>
-                        <ul class="list-unstyled">
+                        <h6 style="font-size: 0.9rem;">Election Details</h6>
+                        <ul class="list-unstyled" style="font-size: 0.85rem;">
                             <li><strong>Title:</strong> {{ settings.election_title }}</li>
                             {% if settings.election_description %}
                                 <li><strong>Description:</strong> {{ settings.election_description }}</li>
@@ -262,8 +266,8 @@
                         </ul>
                     </div>
                     <div class="col-md-6">
-                        <h6>Voting Statistics</h6>
-                        <ul class="list-unstyled">
+                        <h6 style="font-size: 0.9rem;">Voting Statistics</h6>
+                        <ul class="list-unstyled" style="font-size: 0.85rem;">
                             <li><strong>Registered Voters:</strong> {{ total_voters }}</li>
                             <li><strong>Votes Cast:</strong> {{ total_voted }}</li>
                             <li><strong>Turnout Rate:</strong> 
@@ -274,7 +278,7 @@
                                     0%
                                 {% endif %}
                             </li>
-                            <li><strong>Results Generated:</strong> {{ current_time|date:"F d, Y g:i A" }}</li>
+                            <li><strong>Results Generated:</strong> {{ current_time|date:"M d, Y g:i A" }}</li>
                         </ul>
                     </div>
                 </div>

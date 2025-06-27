@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}No Candidates Available{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card" style="border: none; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <div class="card-body text-center p-5">
+                <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 50%; padding: 3rem; display: inline-block; margin-bottom: 2rem;">
+                    <i class="bi bi-person-x" style="font-size: 4rem; color: #dc2626;"></i>
+                </div>
+                
+                <h1 style="color: var(--eesa-primary); font-weight: 700; margin-bottom: 1rem;">No Candidates Available</h1>
+                <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">
+                    There are currently no candidates available for voting. This may be a temporary issue. Please try again later or contact the election administrators.
+                </p>
+                
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'index' %}" class="btn btn-primary" style="border-radius: 12px; padding: 0.8rem 2rem; font-weight: 600;">
+                        <i class="bi bi-house me-2"></i>Return to Homepage
+                    </a>
+                    <a href="{% url 'live_results' %}" class="btn btn-outline-primary" style="border-radius: 12px; padding: 0.8rem 2rem; font-weight: 600;">
+                        <i class="bi bi-bar-chart me-2"></i>View Results
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

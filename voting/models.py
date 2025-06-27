@@ -244,6 +244,16 @@ class ElectionSettings(models.Model):
         blank=True,
         help_text="Email of the technical head who can access audit trails"
     )
+    audit_password = models.CharField(
+        max_length=100,
+        default="audit2025",
+        help_text="Password for audit trail access"
+    )
+    audit_access_code = models.CharField(
+        max_length=50,
+        default="AUDIT-EESA-2025",
+        help_text="Special access code for audit trail"
+    )
     voting_start_time = models.DateTimeField(
         null=True,
         blank=True,
@@ -276,6 +286,8 @@ class ElectionSettings(models.Model):
             existing.show_live_results = self.show_live_results
             existing.results_refresh_interval = self.results_refresh_interval
             existing.technical_head_email = self.technical_head_email
+            existing.audit_password = self.audit_password
+            existing.audit_access_code = self.audit_access_code
             existing.voting_start_time = self.voting_start_time
             existing.voting_end_time = self.voting_end_time
             existing.save()

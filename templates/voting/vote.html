@@ -269,16 +269,35 @@
                     window.location.href = '{% url "voting_complete" %}';
                 }, 2000);
             } else {
-                // Show error message
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger alert-dismissible fade show';
-                errorAlert.innerHTML = `
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    ${data.error}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                `;
-                
-                document.querySelector('main').insertBefore(errorAlert, document.querySelector('main').firstChild);
+                // Check if voting has ended
+                if (data.voting_ended) {
+                    // Show voting ended message and redirect
+                    const warningAlert = document.createElement('div');
+                    warningAlert.className = 'alert alert-warning alert-dismissible fade show';
+                    warningAlert.innerHTML = `
+                        <i class="bi bi-clock me-2"></i>
+                        ${data.error}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    
+                    document.querySelector('main').insertBefore(warningAlert, document.querySelector('main').firstChild);
+                    
+                    // Redirect to homepage after a delay
+                    setTimeout(() => {
+                        window.location.href = '{% url "index" %}';
+                    }, 3000);
+                } else {
+                    // Show regular error message
+                    const errorAlert = document.createElement('div');
+                    errorAlert.className = 'alert alert-danger alert-dismissible fade show';
+                    errorAlert.innerHTML = `
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        ${data.error}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    
+                    document.querySelector('main').insertBefore(errorAlert, document.querySelector('main').firstChild);
+                }
             }
         })
         .catch(error => {

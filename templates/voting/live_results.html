@@ -6,16 +6,102 @@
 <div class="row">
     <div class="col-12">
         <!-- Live Election Results Heading -->
-        <div class="text-center mb-4">
-            <h1 style="color: var(--eesa-primary); font-weight: 700; font-size: 2.5rem; margin-bottom: 0.5rem;">
-                <i class="bi bi-activity" style="color: var(--eesa-gold); margin-right: 0.5rem;"></i>
-                Live Election Results
-            </h1>
-            <p style="color: var(--text-secondary); font-size: 1.1rem; margin: 0;">
-                Real-time EESA voting statistics and current standings
-            </p>
+        <div class="text-center mb-3">
+            {% if election_ended %}
+                <div class="alert" style="background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); color: white; border: none; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.2);">
+                    <h1 style="color: white; font-weight: 700; font-size: 1.5rem; margin-bottom: 0.3rem;">
+                        <i class="bi bi-check-circle" style="color: var(--eesa-gold); margin-right: 0.4rem; font-size: 1.3rem;"></i>
+                        Election Ended - Results Published
+                    </h1>
+                    <p style="margin: 0; font-size: 0.9rem; opacity: 0.95;">
+                        <i class="bi bi-info-circle me-1" style="font-size: 0.8rem;"></i>{{ end_reason }}
+                    </p>
+                </div>
+            {% else %}
+                <h1 style="color: var(--eesa-primary); font-weight: 700; font-size: 1.8rem; margin-bottom: 0.3rem;">
+                    <i class="bi bi-activity" style="color: var(--eesa-gold); margin-right: 0.4rem; font-size: 1.5rem;"></i>
+                    Live Election Results
+                </h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin: 0;">
+                    Real-time EESA voting statistics and current standings
+                </p>
+            {% endif %}
         </div>
 
+        {% if election_ended %}
+            <!-- Election Ended - Final Results Published -->
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);">
+                <div class="card-body text-center p-3">
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <div class="d-flex align-items-center justify-content-center me-3" style="background: #16a34a; border-radius: 50%; width: 56px; height: 56px; flex-shrink: 0;">
+                            <i class="bi bi-trophy" style="font-size: 1.5rem; color: var(--eesa-gold); line-height: 1;"></i>
+                        </div>
+                        <div class="text-start">
+                            <h2 style="color: #16a34a; font-weight: 700; margin: 0; font-size: 1.4rem;">Final Results Published</h2>
+                            <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">EESA Election has concluded - View official results</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
+                            <i class="bi bi-info-circle me-1" style="font-size: 0.75rem;"></i>{{ end_reason }}
+                        </p>
+                        
+                        <div class="row justify-content-center">
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100" style="border: 1px solid #16a34a; border-radius: 12px; background: white;">
+                                    <div class="card-body text-center p-3">
+                                        <div class="mb-2" style="background: #16a34a; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                            <i class="bi bi-people" style="font-size: 1rem; color: white;"></i>
+                                        </div>
+                                        <h4 style="color: #16a34a; font-weight: 700; margin-bottom: 0.2rem;">{{ total_voters }}</h4>
+                                        <p style="color: var(--text-secondary); font-weight: 500; margin: 0; font-size: 0.8rem;">Total Voters</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100" style="border: 1px solid #16a34a; border-radius: 12px; background: white;">
+                                    <div class="card-body text-center p-3">
+                                        <div class="mb-2" style="background: #16a34a; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                            <i class="bi bi-check-circle" style="font-size: 1rem; color: white;"></i>
+                                        </div>
+                                        <h4 style="color: #16a34a; font-weight: 700; margin-bottom: 0.2rem;">{{ total_voted }}</h4>
+                                        <p style="color: var(--text-secondary); font-weight: 500; margin: 0; font-size: 0.8rem;">Votes Cast</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100" style="border: 1px solid #16a34a; border-radius: 12px; background: white;">
+                                    <div class="card-body text-center p-3">
+                                        <div class="mb-2" style="background: #16a34a; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                            <i class="bi bi-graph-up" style="font-size: 1rem; color: white;"></i>
+                                        </div>
+                                        {% widthratio total_voted total_voters 100 as turnout %}
+                                        <h4 style="color: #16a34a; font-weight: 700; margin-bottom: 0.2rem;">{{ turnout|default:0 }}%</h4>
+                                        <p style="color: var(--text-secondary); font-weight: 500; margin: 0; font-size: 0.8rem;">Final Turnout</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center gap-3 mb-4">
+                        <a href="{% url 'final_results' %}" class="btn" style="background: #16a34a; border: 2px solid #16a34a; color: white; border-radius: 10px; padding: 0.6rem 1.5rem; font-weight: 600; text-decoration: none; font-size: 0.9rem;">
+                            <i class="bi bi-trophy me-1" style="font-size: 0.8rem;"></i>View Final Results
+                        </a>
+                        <a href="{% url 'index' %}" class="btn" style="background: white; border: 2px solid #16a34a; color: #16a34a; border-radius: 10px; padding: 0.6rem 1.5rem; font-weight: 600; text-decoration: none; font-size: 0.9rem;">
+                            <i class="bi bi-house me-1" style="font-size: 0.8rem;"></i>Return Home
+                        </a>
+                    </div>
+                    
+                    <div style="background: white; border-radius: 8px; padding: 0.8rem 1.2rem; display: inline-block; border: 1px solid #16a34a;">
+                        <small style="color: var(--text-secondary); font-weight: 500;">
+                            <i class="bi bi-clock me-1"></i>Election ended: <span style="color: #16a34a; font-weight: 600;">{{ current_time|date:"M d, Y H:i" }}</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        {% else %}
         <!-- Compact Statistics Dashboard -->
         <div class="row mb-4 justify-content-center">
             <div class="col-lg-3 col-md-6 mb-3">
@@ -24,8 +110,8 @@
                         <div class="mb-2" style="background: var(--eesa-primary); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
                             <i class="bi bi-people" style="font-size: 1.2rem; color: white;"></i>
                         </div>
-                        <h3 style="color: var(--eesa-primary); font-weight: 700; font-size: 1.8rem; margin-bottom: 0.3rem;">{{ total_voters }}</h3>
-                        <p style="color: var(--text-secondary); font-weight: 500; margin: 0; font-size: 0.9rem;">Eligible Voters</p>
+                        <h3 style="color: var(--eesa-primary); font-weight: 700; font-size: 1.4rem; margin-bottom: 0.2rem;">{{ total_voters }}</h3>
+                        <p style="color: var(--text-secondary); font-weight: 500; margin: 0; font-size: 0.8rem;">Eligible Voters</p>
                     </div>
                 </div>
             </div>
@@ -35,8 +121,8 @@
                         <div class="mb-2" style="background: #16a34a; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
                             <i class="bi bi-check-circle" style="font-size: 1.2rem; color: white;"></i>
                         </div>
-                        <h3 style="color: #16a34a; font-weight: 700; font-size: 1.8rem; margin-bottom: 0.3rem;">{{ total_voted }}</h3>
-                        <p style="color: var(--text-secondary); font-weight: 500; margin: 0; font-size: 0.9rem;">Votes Cast</p>
+                        <h3 style="color: #16a34a; font-weight: 700; font-size: 1.4rem; margin-bottom: 0.2rem;">{{ total_voted }}</h3>
+                        <p style="color: var(--text-secondary); font-weight: 500; margin: 0; font-size: 0.8rem;">Votes Cast</p>
                     </div>
                 </div>
             </div>
@@ -46,8 +132,8 @@
                         <div class="mb-2" style="background: #d97706; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
                             <i class="bi bi-clock" style="font-size: 1.2rem; color: white;"></i>
                         </div>
-                        <h3 style="color: #d97706; font-weight: 700; font-size: 1.8rem; margin-bottom: 0.3rem;">{{ pending_voters }}</h3>
-                        <p style="color: var(--text-secondary); font-weight: 500; margin: 0; font-size: 0.9rem;">Pending</p>
+                        <h3 style="color: #d97706; font-weight: 700; font-size: 1.4rem; margin-bottom: 0.2rem;">{{ pending_voters }}</h3>
+                        <p style="color: var(--text-secondary); font-weight: 500; margin: 0; font-size: 0.8rem;">Pending</p>
                     </div>
                 </div>
             </div>
@@ -58,8 +144,8 @@
                             <i class="bi bi-graph-up" style="font-size: 1.2rem; color: white;"></i>
                         </div>
                         {% widthratio total_voted total_voters 100 as turnout %}
-                        <h3 style="color: #7c3aed; font-weight: 700; font-size: 1.8rem; margin-bottom: 0.3rem;">{{ turnout|default:0 }}%</h3>
-                        <p style="color: var(--text-secondary); font-weight: 500; margin: 0; font-size: 0.9rem;">Turnout</p>
+                        <h3 style="color: #7c3aed; font-weight: 700; font-size: 1.4rem; margin-bottom: 0.2rem;">{{ turnout|default:0 }}%</h3>
+                        <p style="color: var(--text-secondary); font-weight: 500; margin: 0; font-size: 0.8rem;">Turnout</p>
                     </div>
                 </div>
             </div>
@@ -134,7 +220,7 @@
                                         <div class="d-flex align-items-center mb-3">
                                             <div class="me-3">
                                                 <div style="background: {% if forloop.first and result.total_votes > 0 %}linear-gradient(135deg, var(--eesa-gold) 0%, #f59e0b 100%){% else %}var(--eesa-primary){% endif %}; border-radius: 50%; padding: 0.8rem; display: flex; align-items: center; justify-content: center; width: 56px; height: 56px;">
-                                                    <i class="bi bi-person" style="font-size: 1.5rem; color: white;"></i>
+                                                    <i class="bi bi-person" style="font-size: 1.3rem; color: white;"></i>
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1">
@@ -144,7 +230,7 @@
                                         </div>
                                         
                                         <div class="text-center mb-3">
-                                            <h2 class="mb-1" style="color: {% if forloop.first and result.total_votes > 0 %}var(--eesa-gold){% else %}var(--eesa-primary){% endif %}; font-weight: 700; font-size: 2.5rem;">{{ candidate_data.votes }}</h2>
+                                            <h3 class="mb-1" style="color: {% if forloop.first and result.total_votes > 0 %}var(--eesa-gold){% else %}var(--eesa-primary){% endif %}; font-weight: 700; font-size: 1.6rem;">{{ candidate_data.votes }}</h3>
                                             <p class="mb-0" style="color: var(--text-secondary); font-size: 0.9rem; font-weight: 500;">{{ candidate_data.percentage }}% of total votes</p>
                                         </div>
                                         
@@ -175,43 +261,46 @@
                         <i class="bi bi-inbox" style="font-size: 4rem; color: var(--text-secondary);"></i>
                     </div>
                     <h3 style="color: var(--eesa-primary); font-weight: 600; margin-bottom: 1rem;">No Active Positions</h3>
-                    <p style="color: var(--text-secondary); font-size: 1.1rem;">There are currently no active voting positions.</p>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem;">There are currently no active voting positions.</p>
                 </div>
             </div>
         {% endfor %}
 
         <!-- Professional Auto-refresh Controls -->
-        <div class="card" style="border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
-            <div class="card-body text-center p-4">
-                <div class="d-flex justify-content-center align-items-center mb-3">
-                    <div style="background: var(--eesa-primary); border-radius: 50%; padding: 0.8rem; margin-right: 1rem;">
-                        <i class="bi bi-arrow-clockwise" style="font-size: 1.5rem; color: white;"></i>
+        {% if not election_ended %}
+            <div class="card" style="border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+                <div class="card-body text-center p-4">
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <div style="background: var(--eesa-primary); border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                            <i class="bi bi-arrow-clockwise" style="font-size: 1.2rem; color: white;"></i>
+                        </div>
+                        <div class="text-start">
+                            <h5 style="color: var(--eesa-primary); font-weight: 600; margin: 0;">Live Updates</h5>
+                            <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">Automatic refresh every {{ settings.results_refresh_interval }} seconds</p>
+                        </div>
                     </div>
-                    <div class="text-start">
-                        <h5 style="color: var(--eesa-primary); font-weight: 600; margin: 0;">Live Updates</h5>
-                        <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">Automatic refresh every {{ settings.results_refresh_interval }} seconds</p>
+                    
+                    <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+                        <button type="button" class="btn" id="pauseRefresh" style="background: white; border: 2px solid var(--eesa-primary); color: var(--eesa-primary); border-radius: 12px; padding: 0.6rem 1.5rem; font-weight: 500;">
+                            <i class="bi bi-pause-fill me-2"></i>Pause Updates
+                        </button>
+                        <button type="button" class="btn" id="resumeRefresh" style="display: none; background: var(--eesa-primary); border: 2px solid var(--eesa-primary); color: white; border-radius: 12px; padding: 0.6rem 1.5rem; font-weight: 500;">
+                            <i class="bi bi-play-fill me-2"></i>Resume Updates
+                        </button>
+                        <button type="button" class="btn" id="refreshNow" style="background: var(--eesa-gold); border: 2px solid var(--eesa-gold); color: var(--eesa-primary); border-radius: 12px; padding: 0.6rem 1.5rem; font-weight: 600;">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Refresh Now
+                        </button>
                     </div>
-                </div>
-                
-                <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
-                    <button type="button" class="btn" id="pauseRefresh" style="background: white; border: 2px solid var(--eesa-primary); color: var(--eesa-primary); border-radius: 12px; padding: 0.6rem 1.5rem; font-weight: 500;">
-                        <i class="bi bi-pause-fill me-2"></i>Pause Updates
-                    </button>
-                    <button type="button" class="btn" id="resumeRefresh" style="display: none; background: var(--eesa-primary); border: 2px solid var(--eesa-primary); color: white; border-radius: 12px; padding: 0.6rem 1.5rem; font-weight: 500;">
-                        <i class="bi bi-play-fill me-2"></i>Resume Updates
-                    </button>
-                    <button type="button" class="btn" id="refreshNow" style="background: var(--eesa-gold); border: 2px solid var(--eesa-gold); color: var(--eesa-primary); border-radius: 12px; padding: 0.6rem 1.5rem; font-weight: 600;">
-                        <i class="bi bi-arrow-clockwise me-2"></i>Refresh Now
-                    </button>
-                </div>
-                
-                <div style="background: white; border-radius: 8px; padding: 0.8rem 1.2rem; display: inline-block; border: 1px solid #e2e8f0;">
-                    <small style="color: var(--text-secondary); font-weight: 500;">
-                        <i class="bi bi-clock me-1"></i>Last updated: <span id="lastUpdated" style="color: var(--eesa-primary); font-weight: 600;">{{ current_time|date:"H:i:s" }}</span>
-                    </small>
+                    
+                    <div style="background: white; border-radius: 8px; padding: 0.8rem 1.2rem; display: inline-block; border: 1px solid #e2e8f0;">
+                        <small style="color: var(--text-secondary); font-weight: 500;">
+                            <i class="bi bi-clock me-1"></i>Last updated: <span id="lastUpdated" style="color: var(--eesa-primary); font-weight: 600;">{{ current_time|date:"H:i:s" }}</span>
+                        </small>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}
@@ -221,18 +310,26 @@
     let refreshInterval;
     let isPaused = false;
     const refreshRate = {{ settings.results_refresh_interval }} * 1000; // Convert to milliseconds
+    const electionEnded = {% if election_ended %}true{% else %}false{% endif %};
     
     document.addEventListener('DOMContentLoaded', function() {
-        startAutoRefresh();
-        
-        // Control buttons
-        document.getElementById('pauseRefresh').addEventListener('click', pauseRefresh);
-        document.getElementById('resumeRefresh').addEventListener('click', resumeRefresh);
-        document.getElementById('refreshNow').addEventListener('click', refreshResults);
+        // Only start auto-refresh if election hasn't ended
+        if (!electionEnded) {
+            startAutoRefresh();
+            
+            // Control buttons
+            const pauseBtn = document.getElementById('pauseRefresh');
+            const resumeBtn = document.getElementById('resumeRefresh');
+            const refreshBtn = document.getElementById('refreshNow');
+            
+            if (pauseBtn) pauseBtn.addEventListener('click', pauseRefresh);
+            if (resumeBtn) resumeBtn.addEventListener('click', resumeRefresh);
+            if (refreshBtn) refreshBtn.addEventListener('click', refreshResults);
+        }
     });
     
     function startAutoRefresh() {
-        if (!isPaused) {
+        if (!isPaused && !electionEnded) {
             refreshInterval = setInterval(refreshResults, refreshRate);
         }
     }
@@ -252,11 +349,25 @@
     }
     
     function refreshResults() {
+        if (electionEnded) {
+            // If election ended, stop refreshing and potentially redirect
+            clearInterval(refreshInterval);
+            return;
+        }
+        
         fetch('{% url "live_results_api" %}')
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     console.error('Error fetching results:', data.error);
+                    return;
+                }
+                
+                // Check if election ended during refresh
+                if (data.election_ended) {
+                    clearInterval(refreshInterval);
+                    // Reload page to show election ended state
+                    location.reload();
                     return;
                 }
                 
