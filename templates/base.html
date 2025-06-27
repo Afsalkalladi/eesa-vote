@@ -3,96 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %} - Election Voting System</title>
+    <title>{% block title %}{% endblock %} - EESA Elections</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Custom CSS -->
     <style>
         :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #6c757d;
-            --success-color: #198754;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
+            --eesa-primary: #1a365d;
+            --eesa-secondary: #2d3748;
+            --eesa-accent: #3182ce;
+            --eesa-gold: #d69e2e;
+            --eesa-light: #f7fafc;
+            --eesa-dark: #1a202c;
+            --success-color: #38a169;
+            --warning-color: #d69e2e;
+            --danger-color: #e53e3e;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
         }
         
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--eesa-light);
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-primary);
         }
         
         .navbar {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: var(--eesa-primary) !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
         }
         
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            border: none;
-            transition: transform 0.3s ease;
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            text-decoration: none !important;
         }
         
-        .card:hover {
-            transform: translateY(-5px);
+        .navbar-brand:hover {
+            color: white !important;
+        }
+        
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            margin: 0 0.5rem;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: var(--eesa-gold) !important;
+        }
+        
+        .voting-card, .card {
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            background: white;
         }
         
         .btn {
-            border-radius: 25px;
-            padding: 0.5rem 1.5rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            font-size: 0.875rem;
         }
         
         .btn-primary {
-            background: linear-gradient(45deg, var(--primary-color), #0b5ed7);
-            border: none;
+            background: linear-gradient(135deg, var(--eesa-primary) 0%, var(--eesa-accent) 100%);
+            color: white;
         }
         
         .btn-primary:hover {
-            background: linear-gradient(45deg, #0b5ed7, var(--primary-color));
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, var(--eesa-secondary) 0%, var(--eesa-primary) 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #48bb78 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #ed8936 100%);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid var(--eesa-primary);
+            color: var(--eesa-primary);
+            background: transparent;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--eesa-primary);
+            color: white;
         }
         
         .form-control {
             border-radius: 10px;
-            border: 2px solid #e9ecef;
-            transition: border-color 0.3s ease;
+            border: 2px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
         }
         
         .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+            border-color: var(--eesa-accent);
+            box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
         }
         
         .alert {
-            border-radius: 10px;
+            border-radius: 12px;
             border: none;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+        }
+        
+        .alert-info {
+            background: #bee3f8;
+            color: var(--eesa-primary);
+        }
+        
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .alert-warning {
+            background: #faf089;
+            color: #744210;
         }
         
         .progress {
-            height: 10px;
-            border-radius: 5px;
+            height: 12px;
+            border-radius: 10px;
+            background: #e2e8f0;
         }
         
-        .voting-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .progress-bar {
+            border-radius: 10px;
+        }
+        
+        .eesa-badge {
+            background: linear-gradient(135deg, var(--eesa-gold) 0%, #ed8936 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 2rem 1rem;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .stat-item h3 {
+            color: var(--eesa-primary);
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-item p {
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, var(--eesa-dark) 0%, var(--eesa-secondary) 100%);
+            color: white;
+            padding: 3rem 0 2rem;
+            margin-top: 4rem;
+        }
+        
+        .footer h6 {
+            color: var(--eesa-gold);
+            font-weight: 700;
+            font-size: 1.1rem;
         }
         
         .candidate-option {
-            transition: background-color 0.3s ease;
             border-radius: 10px;
             padding: 1rem;
             margin: 0.5rem 0;
         }
         
         .candidate-option:hover {
-            background-color: rgba(13, 110, 253, 0.1);
+            background-color: rgba(13, 110, 253, 0.08);
         }
         
         .candidate-option input[type="radio"]:checked + .candidate-info {
@@ -149,11 +259,14 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'index' %}">
-                <i class="bi bi-check2-square me-2"></i>
-                Election System
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'index' %}">
+                <i class="bi bi-lightning-charge me-3" style="font-size: 1.8rem; color: var(--eesa-gold);"></i>
+                <div class="d-flex flex-column">
+                    <div style="font-size: 1.3rem; line-height: 1.1; font-weight: 700;">EESA Elections</div>
+                    <small style="font-size: 0.75rem; opacity: 0.85; line-height: 1;">Electrical Engineering Students Association</small>
+                </div>
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -227,7 +340,11 @@
 
     <!-- Main Content -->
     <main class="container my-4">
-        {% block content %}{% endblock %}
+        <div class="row justify-content-center">
+            <div class="col-12">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->
@@ -235,13 +352,13 @@
         <div class="container text-center">
             <div class="row">
                 <div class="col-md-6">
-                    <h6>Election Voting System</h6>
-                    <p class="mb-0">Secure • Transparent • Democratic</p>
+                    <h6>EESA Student Council Elections</h6>
+                    <p class="mb-0">Electrical Engineering Students Association</p>
                 </div>
                 <div class="col-md-6">
                     <p class="mb-0">
                         <small>
-                            Built with Django & Bootstrap 5<br>
+                            Secure • Transparent • Democratic<br>
                             Current time: <span id="current-time"></span>
                         </small>
                     </p>

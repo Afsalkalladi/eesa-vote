@@ -4,16 +4,18 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-lg-10">
         <!-- Election Header -->
-        <div class="card voting-card mb-4">
-            <div class="card-body text-center">
-                <h1 class="card-title mb-3">
-                    <i class="bi bi-award text-primary me-2"></i>
+        <div class="card voting-card mb-5 text-center">
+            <div class="card-body py-5">
+                <div class="mb-4">
+                    <i class="bi bi-award" style="font-size: 4rem; color: var(--eesa-gold);"></i>
+                </div>
+                <h1 class="card-title mb-3" style="color: var(--eesa-primary); font-weight: 700;">
                     {{ settings.election_title }}
                 </h1>
                 {% if settings.election_description %}
-                    <p class="card-text text-muted">{{ settings.election_description }}</p>
+                    <p class="card-text text-muted fs-5 mb-4">{{ settings.election_description }}</p>
                 {% endif %}
                 
                 {% if not settings.is_election_active %}
@@ -21,29 +23,36 @@
                         <i class="bi bi-exclamation-triangle me-2"></i>
                         The election system is currently inactive.
                     </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Election Status:</strong> Active | 
+                        <strong>Voting:</strong> {% if is_voting_open %}Open{% else %}Closed{% endif %}
+                    </div>
                 {% endif %}
             </div>
         </div>
 
         <!-- Login Form -->
         {% if not request.session.voter_token %}
-            <div class="card voting-card mb-4">
-                <div class="card-body">
-                    <h3 class="card-title text-center mb-4">
-                        <i class="bi bi-key text-primary me-2"></i>
-                        Enter Your Voting Token
+            <div class="card voting-card mb-5">
+                <div class="card-header text-center" style="background: linear-gradient(135deg, var(--eesa-accent) 0%, var(--eesa-primary) 100%); color: white;">
+                    <h3 class="mb-0">
+                        <i class="bi bi-shield-lock me-2"></i>
+                        Secure Voter Authentication
                     </h3>
-                    
+                </div>
+                <div class="card-body p-4">
                     <form method="post" action="{% url 'login_voter' %}" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="token" class="form-label">Authentication Token</label>
+                        <div class="mb-4">
+                            <label for="token" class="form-label fw-semibold">Authentication Token</label>
                             <input type="text" class="form-control form-control-lg" id="token" name="token" 
                                    placeholder="Enter your unique voting token" required
                                    pattern="[a-fA-F0-9\-]{36}" title="Please enter a valid token">
                             <div class="form-text">
                                 <i class="bi bi-info-circle me-1"></i>
-                                Enter the token provided to you by the election committee
+                                Enter the secure token provided by the EESA Election Committee
                             </div>
                             <div class="invalid-feedback">
                                 Please enter a valid authentication token.
@@ -53,7 +62,7 @@
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg" id="loginBtn">
                                 <i class="bi bi-box-arrow-in-right me-2"></i>
-                                Login to Vote
+                                Access Voting Portal
                             </button>
                         </div>
                     </form>
@@ -108,25 +117,25 @@
         {% endif %}
 
         <!-- Election Stats -->
-        <div class="card voting-card">
-            <div class="card-header">
+        <div class="card voting-card mb-4">
+            <div class="card-header" style="background: linear-gradient(135deg, var(--eesa-primary) 0%, var(--eesa-accent) 100%); color: white;">
                 <h4 class="mb-0">
-                    <i class="bi bi-graph-up text-primary me-2"></i>
+                    <i class="bi bi-graph-up me-2"></i>
                     Election Statistics
                 </h4>
             </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-md-4 mb-3">
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-md-4">
                         <div class="stat-item">
-                            <i class="bi bi-people display-4 text-primary"></i>
+                            <i class="bi bi-people display-4" style="color: var(--eesa-primary);"></i>
                             <h3 class="mt-2">{{ total_voters|default:0 }}</h3>
                             <p class="text-muted">Registered Voters</p>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-4">
                         <div class="stat-item">
-                            <i class="bi bi-check2-square display-4 text-success"></i>
+                            <i class="bi bi-check2-square display-4" style="color: var(--success-color);"></i>
                             <h3 class="mt-2">{{ total_voted|default:0 }}</h3>
                             <p class="text-muted">Votes Cast</p>
                         </div>

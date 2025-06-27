@@ -1,6 +1,6 @@
-# Django Election Voting System
+# EESA Election Voting System
 
-A secure, token-based online class election system built with Django that supports multiple positions, time-limited voting, and anonymous-looking but auditable vote logging.
+A secure, token-based online election system built for the Electrical Engineering Students Association (EESA) using Django. Supports multiple positions, time-limited voting, and anonymous-looking but auditable vote logging.
 
 ## 🎯 Features
 
