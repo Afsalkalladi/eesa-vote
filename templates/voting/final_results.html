@@ -5,136 +5,176 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <!-- Header -->
-        <div class="card voting-card mb-4">
-            <div class="card-body text-center">
-                <h1 class="card-title">
-                    <i class="bi bi-trophy text-warning me-2"></i>
-                    EESA Election Results - Final
+        <!-- Professional Header -->
+        <div class="card voting-card mb-4" style="background: linear-gradient(135deg, var(--eesa-primary) 0%, var(--eesa-accent) 100%); color: white;">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-award" style="font-size: 4rem; color: var(--eesa-gold);"></i>
+                </div>
+                <h1 class="card-title mb-3" style="font-weight: 700; font-size: 2.5rem;">
+                    EESA Election Results
                 </h1>
-                <p class="card-text text-muted">
-                    Electrical Engineering Students Association • Official final results
+                <p class="card-text mb-4" style="font-size: 1.2rem; opacity: 0.9;">
+                    Electrical Engineering Students Association<br>
+                    <strong>Official Final Results - Student Council Elections 2025</strong>
                 </p>
                 
-                <!-- Results Available Notice -->
-                <div class="alert alert-success mt-3">
+                <!-- Results Status Badge -->
+                <div class="badge" style="background: var(--eesa-gold); color: var(--eesa-primary); font-size: 1rem; padding: 0.75rem 1.5rem;">
                     <i class="bi bi-check-circle me-2"></i>
-                    <strong>Results Available:</strong>
                     {% if all_voting_ended and all_voters_voted %}
-                        All voting periods have ended AND all voters have participated
+                        Complete Election Results
                     {% elif all_voting_ended %}
-                        All voting periods have ended
+                        Voting Period Concluded
                     {% elif all_voters_voted %}
-                        All registered voters have cast their votes
+                        100% Voter Participation
                     {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Overall Statistics -->
-        <div class="card voting-card mb-4">
-            <div class="card-header">
-                <h4 class="mb-0">
-                    <i class="bi bi-pie-chart text-primary me-2"></i>
-                    Election Summary
+        <!-- Professional Statistics Dashboard -->
+        <div class="card voting-card mb-5">
+            <div class="card-header" style="background: white; border-bottom: 3px solid var(--eesa-accent);">
+                <h4 class="mb-0" style="color: var(--eesa-primary); font-weight: 600;">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Election Statistics Summary
                 </h4>
             </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-md-4 mb-3">
-                        <div class="stat-item">
-                            <h2 class="text-primary mb-0">{{ total_voters }}</h2>
-                            <p class="text-muted mb-0">Total Registered Voters</p>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="stat-item" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-left: 4px solid var(--eesa-primary);">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="bi bi-people-fill" style="font-size: 2.5rem; color: var(--eesa-primary);"></i>
+                                </div>
+                                <div>
+                                    <h2 class="mb-0" style="color: var(--eesa-primary); font-weight: 700;">{{ total_voters }}</h2>
+                                    <p class="text-muted mb-0 fw-semibold">Registered Voters</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="stat-item">
-                            <h2 class="text-success mb-0">{{ total_voted }}</h2>
-                            <p class="text-muted mb-0">Total Votes Cast</p>
+                    <div class="col-md-4">
+                        <div class="stat-item" style="background: linear-gradient(135deg, #f0fff4 0%, #dcfce7 100%); border-left: 4px solid var(--success-color);">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="bi bi-check-circle-fill" style="font-size: 2.5rem; color: var(--success-color);"></i>
+                                </div>
+                                <div>
+                                    <h2 class="mb-0" style="color: var(--success-color); font-weight: 700;">{{ total_voted }}</h2>
+                                    <p class="text-muted mb-0 fw-semibold">Votes Cast</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="stat-item">
-                            {% widthratio total_voted total_voters 100 as turnout %}
-                            <h2 class="text-warning mb-0">{{ turnout|default:0 }}%</h2>
-                            <p class="text-muted mb-0">Voter Turnout</p>
+                    <div class="col-md-4">
+                        <div class="stat-item" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 4px solid var(--eesa-gold);">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="bi bi-trophy-fill" style="font-size: 2.5rem; color: var(--eesa-gold);"></i>
+                                </div>
+                                <div>
+                                    {% widthratio total_voted total_voters 100 as turnout %}
+                                    <h2 class="mb-0" style="color: var(--eesa-gold); font-weight: 700;">{{ turnout|default:0 }}%</h2>
+                                    <p class="text-muted mb-0 fw-semibold">Voter Turnout</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Winners -->
+        <!-- Winners Section -->
         {% for winner_data in winners_data %}
-            <div class="card voting-card mb-4">
-                <div class="card-header">
-                    <h3 class="mb-0 d-flex align-items-center">
-                        <i class="bi bi-award text-primary me-2"></i>
-                        {{ winner_data.position.title }}
-                        <span class="ms-auto">
-                            <span class="badge bg-success">
-                                <i class="bi bi-trophy me-1"></i>Winner Declared
-                            </span>
-                        </span>
-                    </h3>
+            <div class="card voting-card mb-5">
+                <!-- Professional Position Header -->
+                <div class="card-header" style="background: linear-gradient(135deg, var(--eesa-primary) 0%, var(--eesa-accent) 100%); color: white;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="mb-0 d-flex align-items-center">
+                            <i class="bi bi-award me-3" style="font-size: 1.5rem; color: var(--eesa-gold);"></i>
+                            {{ winner_data.position.title }}
+                        </h3>
+                        <div class="badge" style="background: var(--eesa-gold); color: var(--eesa-primary); font-size: 0.9rem; padding: 0.5rem 1rem;">
+                            <i class="bi bi-trophy me-1"></i>Winner Declared
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="card-body">
-                    <!-- Winner Highlight -->
-                    <div class="winner-highlight p-4 mb-4 rounded" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border: 2px solid #ffc107;">
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <i class="bi bi-trophy text-warning" style="font-size: 3rem;"></i>
-                                    </div>
-                                    <div>
-                                        <h2 class="mb-1 text-dark">{{ winner_data.winner_name }}</h2>
-                                        <p class="mb-0 text-muted">{{ winner_data.winner_reg_no }}</p>
-                                        <small class="text-muted">{{ winner_data.position.title }} Winner</small>
+                <div class="card-body p-4">
+                    <!-- Professional Winner Display -->
+                    <div class="winner-highlight mb-4" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 3px solid var(--eesa-gold); border-radius: 16px; position: relative; overflow: hidden;">
+                        <div class="p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-4">
+                                            <div style="background: var(--eesa-gold); border-radius: 50%; padding: 1rem; display: inline-block;">
+                                                <i class="bi bi-trophy" style="font-size: 2.5rem; color: var(--eesa-primary);"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h1 class="mb-2" style="color: var(--eesa-primary); font-weight: 700; font-size: 2.2rem;">{{ winner_data.winner_name }}</h1>
+                                            <p class="mb-1 fs-5" style="color: var(--text-secondary); font-weight: 500;">{{ winner_data.winner_reg_no }}</p>
+                                            <div class="badge" style="background: var(--eesa-primary); color: white; font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                                                {{ winner_data.position.title }} • Elected
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4 text-end">
-                                <h1 class="mb-0 text-warning">{{ winner_data.votes }}</h1>
-                                <p class="mb-0 text-muted">
-                                    votes out of {{ winner_data.total_votes }}
-                                </p>
-                                {% if winner_data.total_votes > 0 %}
-                                    {% widthratio winner_data.votes winner_data.total_votes 100 as win_percentage %}
-                                    <small class="text-muted">({{ win_percentage }}%)</small>
-                                {% endif %}
+                                <div class="col-md-4 text-end">
+                                    <div class="text-center">
+                                        <div style="background: var(--eesa-primary); color: white; border-radius: 12px; padding: 1.5rem; display: inline-block; min-width: 150px;">
+                                            <h1 class="mb-2" style="color: var(--eesa-gold); font-weight: 700; font-size: 3rem;">{{ winner_data.votes }}</h1>
+                                            <p class="mb-1" style="font-size: 1rem; opacity: 0.9;">Total Votes</p>
+                                            {% if winner_data.total_votes > 0 %}
+                                                {% widthratio winner_data.votes winner_data.total_votes 100 as win_percentage %}
+                                                <div class="badge" style="background: var(--eesa-gold); color: var(--eesa-primary); font-size: 0.9rem;">
+                                                    {{ win_percentage }}% of {{ winner_data.total_votes }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Detailed Results -->
+                    <!-- Professional Detailed Results -->
                     <div class="accordion" id="accordion{{ forloop.counter }}">
-                        <div class="accordion-item">
+                        <div class="accordion-item" style="border: 2px solid var(--eesa-accent); border-radius: 12px;">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
-                                        data-bs-target="#collapse{{ forloop.counter }}">
-                                    <i class="bi bi-bar-chart me-2"></i>
-                                    View Detailed Results
+                                        data-bs-target="#collapse{{ forloop.counter }}" 
+                                        style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: var(--eesa-primary); font-weight: 600; border-radius: 12px;">
+                                    <i class="bi bi-bar-chart-fill me-2"></i>
+                                    View Complete Vote Breakdown
                                 </button>
                             </h2>
                             <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" 
                                  data-bs-parent="#accordion{{ forloop.counter }}">
-                                <div class="accordion-body">
-                                    <h6 class="mb-3">All Candidates - {{ winner_data.position.title }}</h6>
+                                <div class="accordion-body p-4" style="background: #f8fafc;">
+                                    <h5 class="mb-4" style="color: var(--eesa-primary); font-weight: 600;">
+                                        <i class="bi bi-list-ol me-2"></i>
+                                        Complete Results - {{ winner_data.position.title }}
+                                    </h5>
                                     
                                     {% for candidate in winner_data.all_candidates %}
-                                        <div class="candidate-result-final mb-3 p-3 border rounded 
-                                            {% if forloop.first %}border-warning bg-light{% endif %}">
+                                        <div class="candidate-result-final mb-4 p-4 border rounded-3
+                                            {% if forloop.first %}border-3" style="border-color: var(--eesa-gold) !important; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);{% else %}" style="background: white; border-color: #e2e8f0 !important;{% endif %}">
                                             <div class="row align-items-center">
                                                 <div class="col-md-6">
                                                     <div class="d-flex align-items-center">
                                                         {% if forloop.first %}
-                                                            <i class="bi bi-trophy text-warning me-2"></i>
+                                                            <div class="me-3" style="background: var(--eesa-gold); border-radius: 50%; padding: 0.5rem; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px;">
+                                                                <i class="bi bi-trophy" style="color: var(--eesa-primary); font-size: 1.2rem;"></i>
+                                                            </div>
                                                         {% else %}
-                                                            <span class="me-2" style="width: 20px; text-align: center;">
-                                                                {{ forloop.counter }}.
-                                                            </span>
+                                                            <div class="me-3" style="background: var(--eesa-primary); border-radius: 50%; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                                                                {{ forloop.counter }}
+                                                            </div>
                                                         {% endif %}
                                                         <div>
                                                             <h6 class="mb-0">{{ candidate.candidate__name }}</h6>
@@ -149,15 +189,24 @@
                                                 <div class="col-md-3">
                                                     {% if winner_data.total_votes > 0 %}
                                                         {% widthratio candidate.vote_count winner_data.total_votes 100 as percentage %}
-                                                        <div class="progress">
+                                                        <div class="progress" style="height: 8px; border-radius: 4px;">
                                                             <div class="progress-bar 
                                                                 {% if forloop.first %}bg-warning{% else %}bg-primary{% endif %}" 
-                                                                 style="width: {{ percentage }}%">
-                                                                {{ percentage }}%
+                                                                 role="progressbar"
+                                                                 style="width: {{ percentage }}%; border-radius: 4px;"
+                                                                 aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100">
                                                             </div>
                                                         </div>
+                                                        <small class="text-muted mt-1">{{ percentage }}%</small>
                                                     {% else %}
-                                                        <small class="text-muted">0%</small>
+                                                        <div class="progress" style="height: 8px; border-radius: 4px;">
+                                                            <div class="progress-bar bg-secondary" 
+                                                                 role="progressbar"
+                                                                 style="width: 0%; border-radius: 4px;"
+                                                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                            </div>
+                                                        </div>
+                                                        <small class="text-muted mt-1">0%</small>
                                                     {% endif %}
                                                 </div>
                                             </div>
@@ -243,6 +292,7 @@
 
 {% block extra_css %}
 <style>
+    /* Professional winner highlight animation */
     .winner-highlight {
         position: relative;
         overflow: hidden;
@@ -255,8 +305,8 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-        animation: shine 3s infinite;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shine 4s infinite;
     }
     
     @keyframes shine {
@@ -264,18 +314,70 @@
         100% { left: 100%; }
     }
     
+    /* Professional card animations */
     .candidate-result-final {
         transition: all 0.3s ease;
+        position: relative;
     }
     
     .candidate-result-final:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
     
+    /* Professional stat items */
+    .stat-item {
+        padding: 1.5rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    
+    /* Professional accordion styling */
     .accordion-button:not(.collapsed) {
-        background-color: var(--bs-primary);
+        background: var(--eesa-primary);
         color: white;
     }
+    
+    .accordion-button:focus {
+        box-shadow: 0 0 0 3px rgba(var(--eesa-accent), 0.1);
+        border-color: var(--eesa-accent);
+    }
+    
+    /* Professional winner badge animation */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .badge {
+        animation: pulse 2s infinite;
+    }
+    
+    /* Professional scroll animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .voting-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .voting-card:nth-child(2) { animation-delay: 0.1s; }
+    .voting-card:nth-child(3) { animation-delay: 0.2s; }
+    .voting-card:nth-child(4) { animation-delay: 0.3s; }
+    .voting-card:nth-child(5) { animation-delay: 0.4s; }
 </style>
 {% endblock %}
