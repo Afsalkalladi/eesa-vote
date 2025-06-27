@@ -62,11 +62,21 @@ def index(request):
     # Check if voting is globally open
     is_voting_open = settings.is_voting_open()
     
+    # Get voter statistics
+    total_voters = Voter.objects.count()
+    total_voted = Voter.objects.filter(has_voted=True).count()
+    turnout_percentage = 0
+    if total_voters > 0:
+        turnout_percentage = round((total_voted / total_voters) * 100, 1)
+    
     context = {
         'settings': settings,
         'active_positions': active_positions,
         'current_time': now,
         'is_voting_open': is_voting_open,
+        'total_voters': total_voters,
+        'total_voted': total_voted,
+        'turnout_percentage': turnout_percentage,
     }
     
     return render(request, 'voting/index.html', context)
