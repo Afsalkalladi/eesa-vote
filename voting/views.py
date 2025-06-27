@@ -7,20 +7,16 @@ voting process, results display, and admin functionality.
 
 import csv
 import json
-from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
-from django.http import JsonResponse, HttpResponse, Http404
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 from django.views.decorators.cache import never_cache
 from django.db import transaction
 from django.db.models import Count, Q
 from django.utils import timezone
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
 
 from .models import Voter, Position, Candidate, Vote, ElectionSettings
 
@@ -35,11 +31,21 @@ def get_client_ip(request):
     return ip
 
 
+def with_election_settings(view_func):
+    """Decorator to add election settings to view context."""
+    def wrapper(request, *args, **kwargs):
+        if not hasattr(request, '_cached_election_settings'):
+            request._cached_election_settings = ElectionSettings.get_settings()
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+@with_election_settings
 def index(request):
     """
     Home page showing election information and login form.
     """
-    settings = ElectionSettings.get_settings()
+    settings = request._cached_election_settings
     
     # Check if voter is already authenticated
     voter_token = request.session.get('voter_token')
@@ -56,7 +62,6 @@ def index(request):
     
     # Get active positions for display
     now = timezone.now()
-    settings = ElectionSettings.get_settings()
     active_positions = Position.objects.filter(is_active=True)
     
     # Check if voting is globally open
