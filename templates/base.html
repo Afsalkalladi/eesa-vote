@@ -14,6 +14,20 @@
     
     <!-- Custom CSS -->
     <style>
+        /* CSS Reset for mobile viewport issues */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            outline: 0;
+        }
+        
         :root {
             --eesa-primary: #1a365d;
             --eesa-secondary: #2d3748;
@@ -30,8 +44,13 @@
         
         html, body {
             height: 100%;
-            margin: 0;
-            padding: 0;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+        
+        html {
+            /* Use CSS custom property for dynamic viewport height */
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
         }
         
         body {
@@ -40,6 +59,22 @@
             color: var(--text-primary);
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
+            min-height: calc(var(--vh, 1vh) * 100);
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
+            position: relative;
+        }
+        
+        /* Mobile-specific viewport height fix */
+        @supports (-webkit-touch-callout: none) {
+            html {
+                height: -webkit-fill-available;
+            }
+            body {
+                min-height: -webkit-fill-available;
+                height: -webkit-fill-available;
+            }
         }
         
         .navbar {
@@ -158,12 +193,34 @@
         }
         
         /* Footer Styling */
-        .footer {
+        footer {
+            background: var(--eesa-dark) !important;
+            margin-top: auto;
             flex-shrink: 0;
-            width: 100%;
-            min-height: 60px;
-            margin: 0;
-            padding: 0;
+        }
+        
+        footer .hover-link {
+            transition: color 0.3s ease;
+        }
+        
+        footer .hover-link:hover {
+            color: var(--eesa-gold) !important;
+        }
+        
+        /* Ensure no white space below footer on any device */
+        html {
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        body {
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        footer > * {
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
         }
         
         .eesa-badge {
@@ -227,10 +284,81 @@
         }
         
         @media (max-width: 768px) {
-            .footer .d-flex {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
+            html {
+                height: 100vh;
+                height: calc(var(--vh, 1vh) * 100);
+                overflow-x: hidden;
+            }
+            
+            body {
+                min-height: 100vh;
+                min-height: calc(var(--vh, 1vh) * 100);
+                height: 100vh;
+                height: calc(var(--vh, 1vh) * 100);
+                overflow-x: hidden;
+            }
+            
+            /* Mobile footer adjustments - Better Mobile Alignment */
+            footer .row {
+                padding: 0.75rem 0 !important;
+            }
+            
+            footer .col-lg-3,
+            footer .col-lg-5,
+            footer .col-lg-4 {
+                margin-bottom: 0.75rem;
+            }
+            
+            footer .col-lg-3:last-child,
+            footer .col-lg-5:last-child,
+            footer .col-lg-4:last-child {
+                margin-bottom: 0;
+            }
+            
+            /* Mobile stacking order */
+            footer .col-lg-3 {
+                order: 1;
+            }
+            
+            footer .col-lg-5 {
+                order: 2;
+            }
+            
+            footer .col-lg-4 {
+                order: 3;
+            }
+            
+            /* Mobile text centering */
+            footer .col-lg-3,
+            footer .col-lg-5,
+            footer .col-lg-4 {
+                text-align: center !important;
+            }
+            
+            footer span,
+            footer .small {
+                font-size: 0.75rem !important;
+            }
+            
+            footer .badge {
+                font-size: 0.65rem !important;
+                padding: 0.2rem 0.4rem !important;
+            }
+            
+            /* Mobile gap adjustments */
+            footer .gap-3 {
+                gap: 1rem !important;
+            }
+            
+            footer .gap-2 {
+                gap: 0.75rem !important;
+            }
+            
+            /* Keep footer at bottom on mobile too */
+            footer {
+                margin-top: auto !important;
+                margin-bottom: 0 !important;
+                flex-shrink: 0;
             }
             
             .card {
@@ -240,6 +368,69 @@
             .btn {
                 width: 100%;
                 margin: 0.25rem 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Extra small mobile adjustments */
+            html {
+                height: 100vh;
+                height: calc(var(--vh, 1vh) * 100);
+            }
+            
+            body {
+                min-height: 100vh;
+                min-height: calc(var(--vh, 1vh) * 100);
+                height: 100vh;
+                height: calc(var(--vh, 1vh) * 100);
+            }
+            
+            footer .container-fluid {
+                padding: 0 0.75rem !important;
+            }
+            
+            footer .row {
+                padding: 0.5rem 0 !important;
+            }
+            
+            /* Extra small mobile - even more compact */
+            footer .col-lg-3,
+            footer .col-lg-5,
+            footer .col-lg-4 {
+                margin-bottom: 0.5rem;
+            }
+            
+            footer .col-lg-4:last-child {
+                margin-bottom: 0;
+            }
+            
+            footer span,
+            footer .small {
+                font-size: 0.7rem !important;
+            }
+            
+            footer .badge {
+                font-size: 0.6rem !important;
+                padding: 0.15rem 0.3rem !important;
+            }
+            
+            footer .gap-3 {
+                gap: 0.75rem !important;
+            }
+            
+            footer .gap-2 {
+                gap: 0.5rem !important;
+            }
+            
+            /* Ensure time display is prominent on small screens */
+            footer #footer-current-time {
+                font-weight: 600 !important;
+            }
+            
+            footer {
+                margin-top: auto !important;
+                margin-bottom: 0 !important;
+                flex-shrink: 0;
             }
         }
         
@@ -346,36 +537,62 @@
         </div>
     </main>
 
-    <!-- Refined Professional Footer -->
-    <footer class="footer mt-auto" style="flex-shrink: 0;">
-        <div class="d-flex justify-content-between align-items-center px-4" style="border-top: 2px solid var(--eesa-gold); background: var(--eesa-primary); color: white; width: 100%; height: 60px;">
-            <div class="d-flex align-items-center">
-                <div class="d-flex align-items-center justify-content-center" style="background: var(--eesa-gold); border-radius: 6px; width: 32px; height: 32px; margin-right: 0.8rem; flex-shrink: 0;">
-                    <i class="bi bi-lightning" style="color: var(--eesa-primary); font-size: 1rem; line-height: 1;"></i>
-                </div>
-                <div>
-                    <span style="color: var(--eesa-gold); font-weight: 700; font-size: 0.9rem;">EESA Elections</span>
-                </div>
-            </div>
-            
-            <div class="d-flex align-items-center gap-3">
-                <div class="d-flex gap-1">
-                    <span class="d-flex align-items-center" style="background: rgba(255, 255, 255, 0.15); color: white; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500; border: 1px solid rgba(255, 255, 255, 0.2);">
-                        <i class="bi bi-shield-check" style="font-size: 0.7rem; margin-right: 0.3rem; line-height: 1;"></i>Secure
-                    </span>
-                    <span class="d-flex align-items-center" style="background: rgba(255, 255, 255, 0.15); color: white; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500; border: 1px solid rgba(255, 255, 255, 0.2);">
-                        <i class="bi bi-eye" style="font-size: 0.7rem; margin-right: 0.3rem; line-height: 1;"></i>Transparent
-                    </span>
-                    <span class="d-flex align-items-center" style="background: rgba(255, 255, 255, 0.15); color: white; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500; border: 1px solid rgba(255, 255, 255, 0.2);">
-                        <i class="bi bi-vote" style="font-size: 0.7rem; margin-right: 0.3rem; line-height: 1;"></i>Democratic
-                    </span>
+    <!-- Minimal Essential Footer -->
+    <footer class="mt-auto bg-dark text-light">
+        <div class="container-fluid">
+            <!-- Single Row Footer -->
+            <div class="row py-2 align-items-center">
+                <!-- Brand Section -->
+                <div class="col-lg-3 col-md-4 col-sm-12 mb-2 mb-md-0 text-center text-md-start">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start">
+                        <div class="me-2">
+                            <div class="d-flex align-items-center justify-content-center" 
+                                 style="background: var(--eesa-gold); border-radius: 6px; width: 24px; height: 24px;">
+                                <i class="bi bi-lightning" style="color: var(--eesa-primary); font-size: 0.8rem;"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="fw-bold" style="color: var(--eesa-gold); font-size: 0.85rem;">EESA Elections</span>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="d-flex align-items-center" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; padding: 0.3rem 0.6rem;">
-                    <span class="d-flex align-items-center" style="color: rgba(255, 255, 255, 0.9); font-size: 0.75rem;">
-                        <i class="bi bi-clock" style="font-size: 0.7rem; margin-right: 0.3rem; line-height: 1;"></i>
-                        <span id="current-time"></span>
-                    </span>
+                <!-- Essential Links -->
+                <div class="col-lg-5 col-md-4 col-sm-12 mb-2 mb-md-0 text-center">
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="{% url 'index' %}" class="text-decoration-none text-muted hover-link">
+                            <small><i class="bi bi-house me-1"></i>Home</small>
+                        </a>
+                        <a href="{% url 'live_results' %}" class="text-decoration-none text-muted hover-link">
+                            <small><i class="bi bi-bar-chart me-1"></i>Results</small>
+                        </a>
+                        <a href="/admin/" class="text-decoration-none text-muted hover-link" target="_blank">
+                            <small><i class="bi bi-gear me-1"></i>Admin</small>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Time and System Status -->
+                <div class="col-lg-4 col-md-4 col-sm-12 text-center text-md-end">
+                    <div class="d-flex justify-content-center justify-content-md-end align-items-center gap-2 flex-wrap">
+                        <!-- Live Time Display -->
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock me-1 text-muted" style="font-size: 0.7rem;"></i>
+                            <small class="text-light fw-medium" id="footer-current-time" style="font-size: 0.75rem;"></small>
+                        </div>
+                        
+                        <!-- System Status -->
+                        <span class="badge bg-success" style="font-size: 0.6rem;">
+                            <i class="bi bi-circle-fill me-1" style="font-size: 0.4rem;"></i>Online
+                        </span>
+                        
+                        <!-- User Status -->
+                        {% if request.session.voter_token %}
+                        <span class="badge bg-primary" style="font-size: 0.6rem;">
+                            <i class="bi bi-person-check me-1"></i>Active
+                        </span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -386,10 +603,96 @@
     
     <!-- Custom JavaScript -->
     <script>
-        // Update current time
+        // Comprehensive mobile viewport height fix
+        function setMobileVH() {
+            // First, let window settle for mobile browsers
+            setTimeout(() => {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+                
+                // Debug logging
+                console.log('Viewport height:', window.innerHeight, 'vh unit:', vh);
+                
+                // Force recalculation of heights
+                document.body.style.height = '';
+                document.documentElement.style.height = '';
+                
+                // Re-apply heights
+                if (window.innerWidth <= 768) {
+                    document.body.style.minHeight = `calc(${vh * 100}px)`;
+                    document.body.style.height = `calc(${vh * 100}px)`;
+                    document.documentElement.style.height = `calc(${vh * 100}px)`;
+                }
+            }, 100);
+        }
+        
+        // Enhanced mobile detection and handling
+        function isMobile() {
+            return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+        
+        // Set viewport height on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setMobileVH();
+            
+            // Additional mobile-specific fixes
+            if (isMobile()) {
+                // Prevent zoom on input focus
+                const viewportMeta = document.querySelector('meta[name="viewport"]');
+                if (viewportMeta) {
+                    viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+                }
+                
+                // Ensure footer stays at bottom
+                const footer = document.querySelector('.footer');
+                if (footer) {
+                    footer.style.position = 'relative';
+                    footer.style.marginTop = 'auto';
+                    footer.style.flexShrink = '0';
+                }
+            }
+        });
+        
+        // Handle window resize with debouncing
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(setMobileVH, 150);
+        });
+        
+        // Handle orientation change
+        window.addEventListener('orientationchange', () => {
+            // iOS needs longer delay after orientation change
+            setTimeout(setMobileVH, 500);
+        });
+        
+        // Handle scroll events on mobile to adjust for browser UI changes
+        if (isMobile()) {
+            let scrollTimeout;
+            window.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    setMobileVH();
+                }, 300);
+            });
+        }
+        
+        // Update current time for both header and footer
         function updateTime() {
             const now = new Date();
-            document.getElementById('current-time').textContent = now.toLocaleString();
+            const timeString = now.toLocaleString();
+            
+            // Update old time element if it exists
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+            
+            // Update footer time element
+            const footerTimeElement = document.getElementById('footer-current-time');
+            if (footerTimeElement) {
+                footerTimeElement.textContent = timeString;
+            }
         }
         
         updateTime();

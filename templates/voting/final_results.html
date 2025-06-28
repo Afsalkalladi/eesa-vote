@@ -172,22 +172,22 @@
                                                         {% if candidate.candidate__photo %}
                                                             <img src="/media/{{ candidate.candidate__photo }}" 
                                                                  alt="{{ candidate.candidate__name }}" 
-                                                                 class="rounded-circle me-2"
+                                                                 class="rounded-circle me-2 flex-shrink-0"
                                                                  style="width: 32px; height: 32px; object-fit: cover; border: 2px solid {% if forloop.first %}var(--eesa-gold){% else %}var(--eesa-primary){% endif %};">
                                                         {% else %}
                                                             {% if forloop.first %}
-                                                                <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--eesa-gold); border-radius: 50%; width: 32px; height: 32px; flex-shrink: 0;">
+                                                                <div class="d-flex align-items-center justify-content-center me-2 flex-shrink-0" style="background: var(--eesa-gold); border-radius: 50%; width: 32px; height: 32px;">
                                                                     <i class="bi bi-trophy" style="color: var(--eesa-primary); font-size: 0.9rem; line-height: 1;"></i>
                                                                 </div>
                                                             {% else %}
-                                                                <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--eesa-primary); border-radius: 50%; color: white; width: 32px; height: 32px; font-weight: 600; font-size: 0.8rem; flex-shrink: 0;">
+                                                                <div class="d-flex align-items-center justify-content-center me-2 flex-shrink-0" style="background: var(--eesa-primary); border-radius: 50%; color: white; width: 32px; height: 32px; font-weight: 600; font-size: 0.8rem;">
                                                                     {{ forloop.counter }}
                                                                 </div>
                                                             {% endif %}
                                                         {% endif %}
-                                                        <div>
-                                                            <h6 class="mb-0" style="font-size: 0.9rem;">{{ candidate.candidate__name }}</h6>
-                                                            <small class="text-muted" style="font-size: 0.75rem;">{{ candidate.candidate__reg_no }}</small>
+                                                        <div class="min-width-0 flex-grow-1">
+                                                            <h6 class="mb-0 text-truncate" style="font-size: 0.9rem;">{{ candidate.candidate__name }}</h6>
+                                                            <small class="text-muted text-truncate d-block" style="font-size: 0.75rem;">{{ candidate.candidate__reg_no }}</small>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -384,5 +384,115 @@
     .voting-card:nth-child(3) { animation-delay: 0.2s; }
     .voting-card:nth-child(4) { animation-delay: 0.3s; }
     .voting-card:nth-child(5) { animation-delay: 0.4s; }
+    
+    /* Mobile-specific fixes for candidate cards */
+    @media (max-width: 768px) {
+        /* Fix position card headers on mobile */
+        .card-header .d-flex.align-items-center.justify-content-between {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.75rem !important;
+        }
+        
+        .card-header h4 {
+            font-size: 1rem !important;
+            width: 100%;
+            margin-bottom: 0 !important;
+        }
+        
+        .card-header .badge {
+            font-size: 0.7rem !important;
+            padding: 0.25rem 0.5rem !important;
+            align-self: flex-start !important;
+        }
+        
+        .card-header {
+            padding: 0.75rem 1rem !important;
+        }
+        
+        .candidate-result .d-flex,
+        .d-flex.align-items-center {
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+        }
+        
+        .d-flex.align-items-center > div:last-child {
+            min-width: 0 !important;
+            overflow: hidden;
+            flex: 1 1 auto;
+        }
+        
+        .d-flex.align-items-center .flex-shrink-0,
+        .d-flex.align-items-center .me-2,
+        .d-flex.align-items-center .me-3 {
+            flex-shrink: 0 !important;
+        }
+        
+        .d-flex.align-items-center h6,
+        .d-flex.align-items-center small,
+        .d-flex.align-items-center .text-muted {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+        
+        .d-flex.align-items-center h6 {
+            font-size: 0.85rem !important;
+            line-height: 1.2;
+            margin-bottom: 0.1rem !important;
+        }
+        
+        .d-flex.align-items-center small {
+            font-size: 0.7rem !important;
+            line-height: 1.1;
+        }
+        
+        /* Ensure icons/photos don't shrink on mobile */
+        .d-flex.align-items-center img {
+            min-width: 32px !important;
+            min-height: 32px !important;
+            margin-right: 0.5rem !important;
+        }
+        
+        .d-flex.align-items-center .me-2 {
+            margin-right: 0.5rem !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+        }
+        
+        .d-flex.align-items-center .me-3 {
+            margin-right: 0.75rem !important;
+            min-width: 48px !important;
+            min-height: 48px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        /* Extra small mobile adjustments */
+        .d-flex.align-items-center img,
+        .d-flex.align-items-center .me-2 {
+            width: 28px !important;
+            height: 28px !important;
+            min-width: 28px !important;
+            min-height: 28px !important;
+        }
+        
+        .d-flex.align-items-center .me-3 {
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            min-height: 40px !important;
+            margin-right: 0.5rem !important;
+        }
+        
+        .d-flex.align-items-center h6 {
+            font-size: 0.8rem !important;
+        }
+        
+        .d-flex.align-items-center small {
+            font-size: 0.65rem !important;
+        }
+    }
 </style>
 {% endblock %}
