@@ -108,6 +108,53 @@ class PositionModelTest(TestCase):
                 end_time=self.now + timedelta(hours=1)
             )
             position.full_clean()
+    
+    def test_position_with_nullable_times(self):
+        """Test that Position can be created with null start_time and end_time."""
+        position = Position.objects.create(
+            title="Test Position",
+            description="Test description"
+            # start_time and end_time are intentionally not set (null)
+        )
+        
+        self.assertIsNone(position.start_time)
+        self.assertIsNone(position.end_time)
+        self.assertTrue(position.is_active)
+        
+        # Test that clean() doesn't raise ValidationError for null times
+        try:
+            position.clean()
+        except ValidationError:
+            self.fail("clean() raised ValidationError with null times")
+    
+    def test_position_clean_with_valid_times(self):
+        """Test that Position clean() works with valid start/end times."""
+        now = timezone.now()
+        position = Position(
+            title="Test Position",
+            description="Test description",
+            start_time=now,
+            end_time=now + timedelta(hours=1)
+        )
+        
+        # Should not raise ValidationError
+        try:
+            position.clean()
+        except ValidationError:
+            self.fail("clean() raised ValidationError with valid times")
+    
+    def test_position_clean_with_invalid_times(self):
+        """Test that Position clean() raises error with invalid times."""
+        now = timezone.now()
+        position = Position(
+            title="Test Position",
+            description="Test description",
+            start_time=now,
+            end_time=now - timedelta(hours=1)  # end before start
+        )
+        
+        with self.assertRaises(ValidationError):
+            position.clean()
 
 
 class CandidateModelTest(TestCase):

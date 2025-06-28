@@ -73,10 +73,14 @@ class Position(models.Model):
         help_text="Description of the position and responsibilities"
     )
     start_time = models.DateTimeField(
-        help_text="When voting opens for this position"
+        null=True,
+        blank=True,
+        help_text="Legacy field - voting times are now set globally in Election Settings"
     )
     end_time = models.DateTimeField(
-        help_text="When voting closes for this position"
+        null=True,
+        blank=True,
+        help_text="Legacy field - voting times are now set globally in Election Settings"
     )
     is_active = models.BooleanField(
         default=True,
@@ -95,8 +99,9 @@ class Position(models.Model):
         return self.title
 
     def clean(self):
-        """Validate that end_time is after start_time."""
-        if self.end_time <= self.start_time:
+        """Validate that end_time is after start_time (legacy fields)."""
+        # Only validate if both times are set (legacy functionality)
+        if self.start_time and self.end_time and self.end_time <= self.start_time:
             raise ValidationError("End time must be after start time.")
 
     def is_voting_open(self):
