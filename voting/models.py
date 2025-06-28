@@ -228,23 +228,41 @@ class Candidate(models.Model):
         """Upload local photo to GitHub storage and update photo_url."""
         from django.conf import settings
         from .github_storage import github_storage
+        import logging
         
-        if not self.photo or not github_storage.is_configured():
+        logger = logging.getLogger(__name__)
+        
+        if not self.photo:
+            logger.warning(f"No photo to upload for candidate {self.name}")
+            return False
+            
+        if not github_storage.is_configured():
+            logger.warning(f"GitHub storage not configured for candidate {self.name}")
             return False
             
         try:
+            logger.info(f"Attempting to upload photo to GitHub for {self.name} ({self.reg_no})")
+            
             # Upload to GitHub
             github_url = github_storage.upload_image(self.photo, self.reg_no, self.name)
             if github_url:
+                logger.info(f"Successfully uploaded {self.name}'s photo to GitHub: {github_url}")
                 self.photo_url = github_url
+                
                 # Optionally remove local file to save space
                 if getattr(settings, 'REMOVE_LOCAL_AFTER_UPLOAD', False):
+                    logger.info(f"Removing local photo file for {self.name}")
                     self.delete_photo()
+                    
                 self.save(update_fields=['photo_url'])
                 return True
+            else:
+                logger.error(f"Failed to upload photo to GitHub for {self.name}")
+                return False
+                
         except Exception as e:
-            print(f"Error uploading to GitHub for {self.name}: {e}")
-        return False
+            logger.error(f"Error uploading to GitHub for {self.name}: {e}")
+            return False
 
     def delete_photo(self):
         """Safely delete the candidate's photo file and GitHub image."""

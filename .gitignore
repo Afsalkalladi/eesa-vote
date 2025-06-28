@@ -36,6 +36,7 @@ db.sqlite3-journal
 
 # Environment variables
 .env
+.env.*
 .venv
 env/
 venv/
@@ -122,3 +123,17 @@ test_*.html
 *_FIX*.md
 *_DEBUG*.md
 *_TEMP*.md
+
+# Development and deployment scripts
+setup_*.sh
+build_*.sh
+deploy_*.sh
+test_*.sh
+debug_*.py
+*_debug.py
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+db.sqlite3*
