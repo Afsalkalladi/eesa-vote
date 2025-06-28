@@ -219,9 +219,16 @@
                                         
                                         <div class="d-flex align-items-center mb-3">
                                             <div class="me-3">
-                                                <div style="background: {% if forloop.first and result.total_votes > 0 %}linear-gradient(135deg, var(--eesa-gold) 0%, #f59e0b 100%){% else %}var(--eesa-primary){% endif %}; border-radius: 50%; padding: 0.8rem; display: flex; align-items: center; justify-content: center; width: 56px; height: 56px;">
-                                                    <i class="bi bi-person" style="font-size: 1.3rem; color: white;"></i>
-                                                </div>
+                                                {% if candidate_data.candidate.photo %}
+                                                    <img src="{{ candidate_data.candidate.photo.url }}" 
+                                                         alt="{{ candidate_data.candidate.name }}" 
+                                                         class="rounded-circle"
+                                                         style="width: 56px; height: 56px; object-fit: cover; border: 3px solid {% if forloop.first and result.total_votes > 0 %}var(--eesa-gold){% else %}var(--eesa-primary){% endif %};">
+                                                {% else %}
+                                                    <div style="background: {% if forloop.first and result.total_votes > 0 %}linear-gradient(135deg, var(--eesa-gold) 0%, #f59e0b 100%){% else %}var(--eesa-primary){% endif %}; border-radius: 50%; padding: 0.8rem; display: flex; align-items: center; justify-content: center; width: 56px; height: 56px;">
+                                                        <i class="bi bi-person" style="font-size: 1.3rem; color: white;"></i>
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                             <div class="flex-grow-1">
                                                 <h5 class="mb-1" style="color: var(--eesa-primary); font-weight: 600;">{{ candidate_data.candidate.name }}</h5>

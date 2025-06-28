@@ -169,14 +169,21 @@
                                             <div class="row align-items-center">
                                                 <div class="col-md-6">
                                                     <div class="d-flex align-items-center">
-                                                        {% if forloop.first %}
-                                                            <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--eesa-gold); border-radius: 50%; width: 32px; height: 32px; flex-shrink: 0;">
-                                                                <i class="bi bi-trophy" style="color: var(--eesa-primary); font-size: 0.9rem; line-height: 1;"></i>
-                                                            </div>
+                                                        {% if candidate.candidate__photo %}
+                                                            <img src="/media/{{ candidate.candidate__photo }}" 
+                                                                 alt="{{ candidate.candidate__name }}" 
+                                                                 class="rounded-circle me-2"
+                                                                 style="width: 32px; height: 32px; object-fit: cover; border: 2px solid {% if forloop.first %}var(--eesa-gold){% else %}var(--eesa-primary){% endif %};">
                                                         {% else %}
-                                                            <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--eesa-primary); border-radius: 50%; color: white; width: 32px; height: 32px; font-weight: 600; font-size: 0.8rem; flex-shrink: 0;">
-                                                                {{ forloop.counter }}
-                                                            </div>
+                                                            {% if forloop.first %}
+                                                                <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--eesa-gold); border-radius: 50%; width: 32px; height: 32px; flex-shrink: 0;">
+                                                                    <i class="bi bi-trophy" style="color: var(--eesa-primary); font-size: 0.9rem; line-height: 1;"></i>
+                                                                </div>
+                                                            {% else %}
+                                                                <div class="d-flex align-items-center justify-content-center me-2" style="background: var(--eesa-primary); border-radius: 50%; color: white; width: 32px; height: 32px; font-weight: 600; font-size: 0.8rem; flex-shrink: 0;">
+                                                                    {{ forloop.counter }}
+                                                                </div>
+                                                            {% endif %}
                                                         {% endif %}
                                                         <div>
                                                             <h6 class="mb-0" style="font-size: 0.9rem;">{{ candidate.candidate__name }}</h6>

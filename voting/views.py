@@ -520,7 +520,7 @@ def final_results(request):
     for position in positions:
         # Get candidate with most votes for this position
         votes_by_candidate = Vote.objects.filter(position=position).values(
-            'candidate__name', 'candidate__reg_no'
+            'candidate__name', 'candidate__reg_no', 'candidate__photo'
         ).annotate(vote_count=Count('id')).order_by('-vote_count')
         
         if votes_by_candidate:
@@ -531,6 +531,7 @@ def final_results(request):
                 'position': position,
                 'winner_name': winner['candidate__name'],
                 'winner_reg_no': winner['candidate__reg_no'],
+                'winner_photo': winner['candidate__photo'],
                 'votes': winner['vote_count'],
                 'total_votes': total_votes,
                 'all_candidates': list(votes_by_candidate)
