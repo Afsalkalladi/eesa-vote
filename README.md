@@ -396,7 +396,7 @@ This application is production-ready and optimized for deployment on platforms l
    - Create a new Web Service
    - Connect your GitHub repository
    - Use these settings:
-     - **Build Command**: `pip install -r requirements.txt`
+     - **Build Command**: `./build.sh`
      - **Start Command**: `gunicorn election_system.wsgi:application`
      - **Environment Variables**:
        - `DJANGO_SETTINGS_MODULE`: `election_system.production_settings`

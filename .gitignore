@@ -127,7 +127,6 @@ test_*.html
 
 # Development and deployment scripts
 setup_*.sh
-build_*.sh
 deploy_*.sh
 test_*.sh
 debug_*.py

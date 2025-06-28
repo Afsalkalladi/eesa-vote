@@ -29,7 +29,9 @@ Use this checklist to ensure your EESA Election System is properly configured fo
 - [ ] Created account on deployment platform
 - [ ] Connected GitHub repository
 - [ ] Created PostgreSQL database service
-- [ ] Configured web service with correct build/start commands
+- [ ] Configured web service with correct build/start commands:
+  - **Build Command**: `./build.sh`
+  - **Start Command**: `gunicorn election_system.wsgi:application`
 
 ### 2. Environment Variables
 Set these in your deployment platform:
