@@ -55,9 +55,20 @@ STATICFILES_DIRS = [
 # WhiteNoise configuration for serving static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Configure WhiteNoise to also serve media files in production
+# This is a temporary solution - for production, use cloud storage like AWS S3
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = True
+
 # Media files configuration for production
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# GitHub storage configuration for free cloud image storage
+GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN', None)
+GITHUB_IMAGES_REPO = os.environ.get('GITHUB_IMAGES_REPO', None)  # format: "username/repo-name"
+GITHUB_IMAGES_BRANCH = os.environ.get('GITHUB_IMAGES_BRANCH', 'main')
+USE_GITHUB_STORAGE = os.environ.get('USE_GITHUB_STORAGE', 'False').lower() == 'true'
 
 # File upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB

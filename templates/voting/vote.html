@@ -57,12 +57,16 @@
                                                        required>
                                                 
                                                 <div class="candidate-info ms-3">
-                                                    {% if candidate.photo %}
+                                                    {% if candidate.has_photo %}
                                                         <div class="mb-2">
-                                                            <img src="{{ candidate.photo.url }}" 
+                                                            <img src="{{ candidate.get_photo_url }}" 
                                                                  alt="{{ candidate.name }}" 
                                                                  class="rounded-circle"
-                                                                 style="width: 60px; height: 60px; object-fit: cover;">
+                                                                 style="width: 60px; height: 60px; object-fit: cover;"
+                                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                            <div style="display: none;">
+                                                                <i class="bi bi-person-circle display-4 text-muted"></i>
+                                                            </div>
                                                         </div>
                                                     {% else %}
                                                         <div class="mb-2">

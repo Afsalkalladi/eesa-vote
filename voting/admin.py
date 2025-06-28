@@ -182,7 +182,7 @@ class CandidateAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Candidate Information', {
-            'fields': ('name', 'reg_no', 'bio', 'photo', 'photo_preview', 'is_active')
+            'fields': ('name', 'reg_no', 'bio', 'photo', 'photo_url', 'photo_preview', 'is_active')
         }),
         ('Positions', {
             'fields': ('positions',)
@@ -192,7 +192,7 @@ class CandidateAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-    readonly_fields = ['created_at', 'updated_at', 'photo_preview']
+    readonly_fields = ['created_at', 'updated_at', 'photo_preview', 'photo_url']
     actions = ['activate_candidates', 'deactivate_candidates']
 
     def photo_preview(self, obj):

@@ -124,10 +124,18 @@ class Command(BaseCommand):
             photo_url = candidate_data['photo_url']
             row_num = candidate_data['row_num']
 
-            # Handle photo download
+            # Handle photo - support both local files and URLs
             photo_file = None
+            is_github_url = False
+            
             if photo_url and not dry_run:
-                photo_file = self.download_photo(photo_url, name)
+                # Check if it's already a GitHub URL
+                if 'raw.githubusercontent.com' in photo_url:
+                    is_github_url = True
+                    # Direct GitHub URL - store directly
+                else:
+                    # Local file or HTTP URL - download/process it
+                    photo_file = self.download_photo(photo_url, name)
 
             # Check if candidate already exists
             existing_candidate = Candidate.objects.filter(reg_no=reg_no).first()
@@ -138,17 +146,24 @@ class Command(BaseCommand):
                     if not dry_run:
                         existing_candidate.name = name
                         existing_candidate.bio = bio
-                        # Update photo if provided and successfully processed
-                        if photo_file:
+                        
+                        # Handle photo updates
+                        if is_github_url:
+                            # Direct GitHub URL
+                            existing_candidate.photo_url = photo_url
+                        elif photo_file:
+                            # Local file - set it and let the model handle GitHub upload
                             try:
                                 existing_candidate.photo = photo_file
                             except Exception as e:
                                 self.stdout.write(
                                     self.style.WARNING(f'  📷 Error setting photo for {name}: {str(e)[:50]}...')
                                 )
+                        
                         # Add position if not already assigned
                         if position not in existing_candidate.positions.all():
                             existing_candidate.positions.add(position)
+                        
                         try:
                             existing_candidate.save()
                             updated_count += 1
@@ -175,8 +190,14 @@ class Command(BaseCommand):
                             reg_no=reg_no,
                             bio=bio
                         )
-                        # Set photo if provided and successfully processed
-                        if photo_file:
+                        
+                        # Handle photo
+                        if is_github_url:
+                            # Direct GitHub URL
+                            candidate.photo_url = photo_url
+                            candidate.save(update_fields=['photo_url'])
+                        elif photo_file:
+                            # Local file - set it and let the model handle GitHub upload
                             try:
                                 candidate.photo = photo_file
                                 candidate.save()
@@ -184,8 +205,10 @@ class Command(BaseCommand):
                                 self.stdout.write(
                                     self.style.WARNING(f'  📷 Error setting photo for {name}: {str(e)[:50]}...')
                                 )
+                        
                         candidate.positions.add(position)
                         created_count += 1
+                        
                     except Exception as e:
                         # If creation fails entirely, log and continue
                         self.stdout.write(

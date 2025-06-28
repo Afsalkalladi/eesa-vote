@@ -179,6 +179,11 @@ class Candidate(models.Model):
         validators=[validate_image_file],
         help_text="Profile photo of the candidate (Max 5MB, formats: JPG, PNG, GIF)"
     )
+    photo_url = models.URLField(
+        blank=True,
+        null=True,
+        help_text="Cloud storage URL for the candidate photo (automatically set)"
+    )
     is_active = models.BooleanField(
         default=True,
         help_text="Whether this candidate is active in the election"
@@ -200,7 +205,14 @@ class Candidate(models.Model):
         return ", ".join([pos.title for pos in self.positions.all()])
 
     def get_photo_url(self):
-        """Get the photo URL with proper error handling."""
+        """Get the photo URL with proper error handling, prioritizing cloud storage."""
+        from django.conf import settings
+        
+        # First, check if we have a cloud URL
+        if self.photo_url:
+            return self.photo_url
+            
+        # Fallback to local photo file
         try:
             if self.photo and hasattr(self.photo, 'url'):
                 return self.photo.url
@@ -209,11 +221,48 @@ class Candidate(models.Model):
         return None
 
     def has_photo(self):
-        """Check if candidate has a valid photo."""
-        return bool(self.get_photo_url())
+        """Check if candidate has a valid photo (cloud or local)."""
+        return bool(self.photo_url or (self.photo and self.get_photo_url()))
+
+    def upload_to_github(self):
+        """Upload local photo to GitHub storage and update photo_url."""
+        from django.conf import settings
+        from .github_storage import github_storage
+        
+        if not self.photo or not github_storage.is_configured():
+            return False
+            
+        try:
+            # Upload to GitHub
+            github_url = github_storage.upload_image(self.photo, self.reg_no, self.name)
+            if github_url:
+                self.photo_url = github_url
+                # Optionally remove local file to save space
+                if getattr(settings, 'REMOVE_LOCAL_AFTER_UPLOAD', False):
+                    self.delete_photo()
+                self.save(update_fields=['photo_url'])
+                return True
+        except Exception as e:
+            print(f"Error uploading to GitHub for {self.name}: {e}")
+        return False
 
     def delete_photo(self):
-        """Safely delete the candidate's photo file."""
+        """Safely delete the candidate's photo file and GitHub image."""
+        from .github_storage import github_storage
+        
+        # Delete from GitHub if we have a URL
+        if self.photo_url and github_storage.is_configured():
+            try:
+                # Extract file path from GitHub URL
+                if 'raw.githubusercontent.com' in self.photo_url:
+                    parts = self.photo_url.split('/')
+                    if len(parts) >= 2:
+                        file_path = '/'.join(parts[-2:])  # Get last two parts (folder/filename)
+                        github_storage.delete_image(file_path)
+            except Exception:
+                pass  # Fail silently
+        
+        # Delete local file
         if self.photo:
             try:
                 if default_storage.exists(self.photo.name):
@@ -221,9 +270,15 @@ class Candidate(models.Model):
             except Exception:
                 pass  # Fail silently to avoid breaking the model
             self.photo = None
+        
+        # Clear cloud URL
+        self.photo_url = None
 
     def save(self, *args, **kwargs):
         """Override save to handle photo operations safely and validate."""
+        from django.conf import settings
+        from .github_storage import github_storage
+        
         # Validate photo if it exists
         if self.photo:
             try:
@@ -235,6 +290,13 @@ class Candidate(models.Model):
         
         try:
             super().save(*args, **kwargs)
+            
+            # After successful save, try to upload to GitHub if configured and we have a local photo
+            if (self.photo and not self.photo_url and 
+                getattr(settings, 'USE_GITHUB_STORAGE', False) and 
+                github_storage.is_configured()):
+                self.upload_to_github()
+                
         except Exception as e:
             # If there's an error with the photo, try saving without it
             if self.photo:
