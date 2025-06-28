@@ -57,46 +57,46 @@ A secure, token-based online election system built for the Electrical Engineerin
    ```bash
    # Copy environment template
    cp .env.example .env.github
-   
+
    # Edit .env.github with your settings
    # For development, you can leave GitHub settings as-is
    # For production, configure GitHub storage (see GITHUB_STORAGE_SETUP.md)
    ```
 
-2. **Database Setup**
+3. **Database Setup**
 
    ```bash
    python manage.py makemigrations
    python manage.py migrate
    ```
 
-3. **Create Admin User**
+4. **Create Admin User**
 
    ```bash
    python manage.py createsuperuser
    ```
 
-4. **Configure GitHub Storage** (Optional for development, required for production)
+5. **Configure GitHub Storage** (Optional for development, required for production)
 
    See [GITHUB_STORAGE_SETUP.md](GITHUB_STORAGE_SETUP.md) for detailed instructions on setting up free image hosting.
 
-5. **Import Sample Data** (Optional)
+6. **Import Sample Data** (Optional)
 
    ```bash
    # Import sample voters
    python manage.py import_voters sample_voters.csv
-   
+
    # Import sample candidates
    python manage.py import_candidates sample_candidates.csv
    ```
 
-6. **Start Development Server**
+7. **Start Development Server**
 
    ```bash
    python manage.py runserver
    ```
 
-7. **Access the System**
+8. **Access the System**
    - Main Site: http://127.0.0.1:8000/
    - Admin Panel: http://127.0.0.1:8000/admin/
 
@@ -412,6 +412,7 @@ This application is production-ready and optimized for deployment on platforms l
    - Import your voter and candidate data
 
 For detailed setup instructions, see:
+
 - [GITHUB_STORAGE_SETUP.md](GITHUB_STORAGE_SETUP.md) - Image storage configuration
 - [CLOUD_STORAGE_GUIDE.md](CLOUD_STORAGE_GUIDE.md) - Cloud storage options and setup
 
