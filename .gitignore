@@ -107,3 +107,18 @@ celerybeat-schedule
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Test files and temporary files
+test_*.py
+test_*.html
+*_test.py
+*_test.html
+*TEST*.jpg
+*TEST*.png
+*TEST*.gif
+*TEST*.txt
+
+# Development documentation (keep only essential docs)
+*_FIX*.md
+*_DEBUG*.md
+*_TEMP*.md

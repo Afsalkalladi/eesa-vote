@@ -6,11 +6,12 @@ voters, candidates, and viewing results.
 """
 
 from django.contrib import admin
-from django.db.models import Count
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from .models import Voter, Position, Candidate, Vote, ElectionSettings
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+from .models import ElectionSettings, Voter, Position, Candidate, Vote
 
 
 @admin.register(ElectionSettings)
@@ -181,7 +182,7 @@ class CandidateAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Candidate Information', {
-            'fields': ('name', 'reg_no', 'bio', 'photo', 'is_active')
+            'fields': ('name', 'reg_no', 'bio', 'photo', 'photo_preview', 'is_active')
         }),
         ('Positions', {
             'fields': ('positions',)
@@ -191,8 +192,18 @@ class CandidateAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['created_at', 'updated_at', 'photo_preview']
     actions = ['activate_candidates', 'deactivate_candidates']
+
+    def photo_preview(self, obj):
+        """Display photo preview in admin."""
+        if obj.has_photo():
+            return format_html(
+                '<img src="{}" style="max-width: 150px; max-height: 150px; border-radius: 8px;" />',
+                obj.get_photo_url()
+            )
+        return "No photo uploaded"
+    photo_preview.short_description = "Photo Preview"
 
     def changelist_view(self, request, extra_context=None):
         """Add import link to the changelist view."""
@@ -226,6 +237,23 @@ class CandidateAdmin(admin.ModelAdmin):
             '<br>'.join([pos.title for pos in positions])
         )
     get_positions_list.short_description = 'Positions'
+
+    def save_model(self, request, obj, form, change):
+        """Override save_model to handle photo upload errors gracefully."""
+        try:
+            super().save_model(request, obj, form, change)
+            if obj.has_photo():
+                messages.success(request, f"Candidate {obj.name} saved successfully with photo.")
+            else:
+                messages.success(request, f"Candidate {obj.name} saved successfully.")
+        except ValidationError as e:
+            messages.error(request, f"Error saving candidate: {e}")
+            raise
+        except Exception as e:
+            messages.error(request, f"Error uploading photo for {obj.name}. Candidate saved without photo. Error: {str(e)}")
+            # Try to save without photo
+            obj.delete_photo()
+            super().save_model(request, obj, form, change)
 
 
 @admin.register(Vote)

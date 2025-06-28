@@ -24,6 +24,6 @@ urlpatterns = [
     path('', include('voting.urls')),
 ]
 
-# Serve media files during development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files in both development and production
+# Note: In production, this should ideally be handled by a web server or CDN
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

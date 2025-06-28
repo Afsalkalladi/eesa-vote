@@ -138,25 +138,61 @@ class Command(BaseCommand):
                     if not dry_run:
                         existing_candidate.name = name
                         existing_candidate.bio = bio
-                        # Update photo if provided
+                        # Update photo if provided and successfully processed
                         if photo_file:
-                            existing_candidate.photo = photo_file
+                            try:
+                                existing_candidate.photo = photo_file
+                            except Exception as e:
+                                self.stdout.write(
+                                    self.style.WARNING(f'  📷 Error setting photo for {name}: {str(e)[:50]}...')
+                                )
                         # Add position if not already assigned
                         if position not in existing_candidate.positions.all():
                             existing_candidate.positions.add(position)
-                        existing_candidate.save()
-                        updated_count += 1
+                        try:
+                            existing_candidate.save()
+                            updated_count += 1
+                        except Exception as e:
+                            # If save fails with photo, try without photo
+                            if existing_candidate.photo:
+                                existing_candidate.photo = None
+                                existing_candidate.save()
+                                updated_count += 1
+                                self.stdout.write(
+                                    self.style.WARNING(f'  📷 Saved {name} without photo due to error: {str(e)[:50]}...')
+                                )
+                            else:
+                                raise e
                 else:
                     action = '⏭️  SKIP (exists)'
                     skipped_count += 1
             else:
                 action = '✅ CREATE'
                 if not dry_run:
-                    candidate = Candidate.objects.create(
-                        name=name,
-                        reg_no=reg_no,
-                        bio=bio
-                    )
+                    try:
+                        candidate = Candidate.objects.create(
+                            name=name,
+                            reg_no=reg_no,
+                            bio=bio
+                        )
+                        # Set photo if provided and successfully processed
+                        if photo_file:
+                            try:
+                                candidate.photo = photo_file
+                                candidate.save()
+                            except Exception as e:
+                                self.stdout.write(
+                                    self.style.WARNING(f'  📷 Error setting photo for {name}: {str(e)[:50]}...')
+                                )
+                        candidate.positions.add(position)
+                        created_count += 1
+                    except Exception as e:
+                        # If creation fails entirely, log and continue
+                        self.stdout.write(
+                            self.style.ERROR(f'  ❌ Failed to create candidate {name}: {str(e)[:50]}...')
+                        )
+                        errors.append(f'Row {row_num}: Failed to create candidate {name}: {str(e)[:50]}')
+                        continue
                     # Set photo if provided
                     if photo_file:
                         candidate.photo = photo_file
@@ -201,7 +237,7 @@ class Command(BaseCommand):
             self.stdout.write('  3. Verify position assignments')
 
     def download_photo(self, photo_url, candidate_name):
-        """Download photo from URL and return Django File object."""
+        """Download photo from URL and return Django File object with better error handling."""
         if not photo_url:
             return None
             
@@ -216,31 +252,36 @@ class Command(BaseCommand):
             
             # Handle local file paths
             if os.path.exists(photo_url):
+                # Validate file size before processing
+                file_size = os.path.getsize(photo_url)
+                if file_size > 5 * 1024 * 1024:  # 5MB limit
+                    self.stdout.write(
+                        self.style.WARNING(f'  📷 Photo too large for {candidate_name}: {file_size / 1024 / 1024:.1f}MB (max 5MB)')
+                    )
+                    return None
+                
                 with open(photo_url, 'rb') as f:
-                    # Get file extension
+                    # Get file extension and validate
                     _, ext = os.path.splitext(photo_url)
                     if not ext:
                         ext = '.jpg'
+                    ext = ext.lower()
                     
-                    # Create a Django file object
-                    django_file = File(f)
-                    filename = f"{candidate_name.replace(' ', '_').lower()}{ext}"
+                    valid_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+                    if ext not in valid_extensions:
+                        self.stdout.write(
+                            self.style.WARNING(f'  📷 Invalid file type for {candidate_name}: {ext}')
+                        )
+                        return None
                     
-                    # Create a temporary file to store the content
-                    temp_file = NamedTemporaryFile(delete=False)
-                    temp_file.write(f.read())
-                    temp_file.close()
+                    # Create shorter, cleaner filename to avoid path length issues
+                    clean_name = candidate_name.replace(' ', '_').replace('-', '_').lower()[:20]  # Limit name length
+                    filename = f"{clean_name}{ext}"
                     
-                    # Re-open as Django File
-                    with open(temp_file.name, 'rb') as temp_f:
-                        django_file = File(temp_f, name=filename)
-                        # We need to read the content and create a proper file
-                        content = temp_f.read()
+                    # Read file content
+                    content = f.read()
                     
-                    # Clean up temp file
-                    os.unlink(temp_file.name)
-                    
-                    # Create final file object
+                    # Create Django file object
                     from django.core.files.base import ContentFile
                     return ContentFile(content, name=filename)
             else:
@@ -251,6 +292,6 @@ class Command(BaseCommand):
                 
         except Exception as e:
             self.stdout.write(
-                self.style.WARNING(f'  📷 Error downloading photo for {candidate_name}: {str(e)}')
+                self.style.WARNING(f'  📷 Error processing photo for {candidate_name}: {str(e)[:100]}...')
             )
             return None

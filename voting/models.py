@@ -2,13 +2,43 @@
 Models for the Django Election Voting System.
 
 This module contains all the database models for managing elections,
-voters, candidates, and votes with proper relationships and constraints.
+voters, candidates, and votes with proper relati    photo = models.ImageField(
+        upload_to=candidate_photo_path, 
+        blank=True, 
+        null=True,
+        validators=[validate_image_file],
+        help_text="Profile photo of the candidate (Max 5MB, formats: JPG, PNG, GIF)"
+    )s and constraints.
 """
 
 import uuid
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.core.files.storage import default_storage
+import os
+
+
+def validate_image_file(value):
+    """Validate uploaded image file size and format."""
+    if value:
+        # Check file size (limit to 5MB)
+        if value.size > 5 * 1024 * 1024:
+            raise ValidationError("Image file size cannot exceed 5MB.")
+        
+        # Check file extension
+        ext = os.path.splitext(value.name)[1].lower()
+        valid_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+        if ext not in valid_extensions:
+            raise ValidationError(f"Unsupported file extension. Allowed: {', '.join(valid_extensions)}")
+
+
+def candidate_photo_path(instance, filename):
+    """Generate a shorter, cleaner path for candidate photos."""
+    # Use candidate ID and clean filename to avoid path length issues
+    ext = os.path.splitext(filename)[1].lower()
+    clean_filename = f"candidate_{instance.reg_no}{ext}"
+    return f"candidates/{clean_filename}"
 
 
 class Voter(models.Model):
@@ -143,10 +173,11 @@ class Candidate(models.Model):
         help_text="Positions this candidate is contesting for"
     )
     photo = models.ImageField(
-        upload_to='candidate_photos/', 
+        upload_to=candidate_photo_path, 
         blank=True, 
         null=True,
-        help_text="Profile photo of the candidate"
+        validators=[validate_image_file],
+        help_text="Profile photo of the candidate (Max 5MB, formats: JPG, PNG, GIF)"
     )
     is_active = models.BooleanField(
         default=True,
@@ -167,6 +198,50 @@ class Candidate(models.Model):
     def get_positions_list(self):
         """Get a comma-separated list of positions this candidate is contesting."""
         return ", ".join([pos.title for pos in self.positions.all()])
+
+    def get_photo_url(self):
+        """Get the photo URL with proper error handling."""
+        try:
+            if self.photo and hasattr(self.photo, 'url'):
+                return self.photo.url
+        except (ValueError, AttributeError):
+            pass
+        return None
+
+    def has_photo(self):
+        """Check if candidate has a valid photo."""
+        return bool(self.get_photo_url())
+
+    def delete_photo(self):
+        """Safely delete the candidate's photo file."""
+        if self.photo:
+            try:
+                if default_storage.exists(self.photo.name):
+                    default_storage.delete(self.photo.name)
+            except Exception:
+                pass  # Fail silently to avoid breaking the model
+            self.photo = None
+
+    def save(self, *args, **kwargs):
+        """Override save to handle photo operations safely and validate."""
+        # Validate photo if it exists
+        if self.photo:
+            try:
+                validate_image_file(self.photo)
+            except ValidationError as e:
+                # Log the validation error and remove the photo
+                print(f"Photo validation failed for {self.name}: {e}")
+                self.photo = None
+        
+        try:
+            super().save(*args, **kwargs)
+        except Exception as e:
+            # If there's an error with the photo, try saving without it
+            if self.photo:
+                self.delete_photo()
+                super().save(*args, **kwargs)
+            else:
+                raise e
 
 
 class Vote(models.Model):
