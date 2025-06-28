@@ -694,6 +694,173 @@ class AdminFunctionalityTest(TestCase):
         # Cleanup
         settings.election_title = original_title
         settings.save()
+    
+    def test_import_candidates_command(self):
+        """Test the import_candidates management command"""
+        from django.core.management import call_command
+        from io import StringIO
+        import tempfile
+        import os
+        
+        # Create positions for testing
+        president = Position.objects.create(
+            title='President',
+            description='Test President position',
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(days=30)
+        )
+        
+        # Create CSV content
+        csv_content = """name,reg_no,description,position
+Test Candidate,TC001,Test bio for candidate,President
+Another Candidate,TC002,Another test bio,President"""
+        
+        # Create temporary CSV file
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+            f.write(csv_content)
+            csv_file = f.name
+        
+        try:
+            # Test dry run
+            out = StringIO()
+            call_command('import_candidates', csv_file, '--dry-run', stdout=out)
+            output = out.getvalue()
+            self.assertIn('DRY RUN MODE', output)
+            self.assertIn('Would create: 2', output)
+            
+            # Verify no candidates were created in dry run
+            self.assertEqual(Candidate.objects.count(), 0)
+            
+            # Test actual import
+            out = StringIO()
+            call_command('import_candidates', csv_file, stdout=out)
+            output = out.getvalue()
+            self.assertIn('Created: 2', output)
+            
+            # Verify candidates were created
+            self.assertEqual(Candidate.objects.count(), 2)
+            candidate = Candidate.objects.get(reg_no='TC001')
+            self.assertEqual(candidate.name, 'Test Candidate')
+            self.assertEqual(candidate.bio, 'Test bio for candidate')
+            self.assertIn(president, candidate.positions.all())
+            
+        finally:
+            # Clean up temporary file
+            os.unlink(csv_file)
+
+    def test_import_candidates_update_mode(self):
+        """Test the import_candidates command with update mode"""
+        from django.core.management import call_command
+        from io import StringIO
+        import tempfile
+        import os
+        
+        # Create position and existing candidate
+        president = Position.objects.create(
+            title='President',
+            description='Test President position',
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(days=30)
+        )
+        
+        existing_candidate = Candidate.objects.create(
+            name='Old Name',
+            reg_no='TC001',
+            bio='Old bio'
+        )
+        
+        # Create CSV with updated info
+        csv_content = """name,reg_no,description,position
+Updated Name,TC001,Updated bio for candidate,President"""
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+            f.write(csv_content)
+            csv_file = f.name
+        
+        try:
+            # Test update mode
+            out = StringIO()
+            call_command('import_candidates', csv_file, '--update', stdout=out)
+            output = out.getvalue()
+            self.assertIn('Updated: 1', output)
+            
+            # Verify candidate was updated
+            existing_candidate.refresh_from_db()
+            self.assertEqual(existing_candidate.name, 'Updated Name')
+            self.assertEqual(existing_candidate.bio, 'Updated bio for candidate')
+            self.assertIn(president, existing_candidate.positions.all())
+            
+        finally:
+            os.unlink(csv_file)
+
+    def test_import_candidates_web_interface(self):
+        """Test the web interface for importing candidates"""
+        from django.contrib.auth.models import User
+        from django.test import Client
+        import tempfile
+        import os
+        
+        # Create admin user with unique username
+        admin_user = User.objects.create_user(
+            username='webtest_admin',
+            password='testpass',
+            is_staff=True
+        )
+        
+        # Create position for testing
+        president = Position.objects.create(
+            title='President',
+            description='Test President position',
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(days=30)
+        )
+        
+        # Create CSV content
+        csv_content = """name,reg_no,description,position
+Web Test Candidate,WTC001,Test bio through web interface,President"""
+        
+        # Create temporary CSV file
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+            f.write(csv_content)
+            csv_file_path = f.name
+        
+        try:
+            client = Client()
+            
+            # Test that anonymous user is redirected to login
+            response = client.get('/import-candidates/')
+            self.assertEqual(response.status_code, 302)
+            
+            # Login as admin
+            client.login(username='webtest_admin', password='testpass')
+            
+            # Test GET request shows the form
+            response = client.get('/import-candidates/')
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'Import Candidates from CSV')
+            self.assertContains(response, 'Available Positions')
+            
+            # Test CSV upload
+            with open(csv_file_path, 'rb') as csv_file:
+                response = client.post('/import-candidates/', {
+                    'csv_file': csv_file
+                })
+            
+            # Should redirect back to the same page with success message
+            self.assertEqual(response.status_code, 200)
+            
+            # Verify candidate was created
+            self.assertEqual(Candidate.objects.count(), 1)
+            candidate = Candidate.objects.first()
+            self.assertEqual(candidate.name, 'Web Test Candidate')
+            self.assertEqual(candidate.reg_no, 'WTC001')
+            self.assertEqual(candidate.bio, 'Test bio through web interface')
+            self.assertIn(president, candidate.positions.all())
+            
+        finally:
+            os.unlink(csv_file_path)
+
+    # ...existing test methods...
 
 
 class EdgeCaseTest(TestCase):

@@ -192,6 +192,25 @@ class CandidateAdmin(admin.ModelAdmin):
         }),
     )
     readonly_fields = ['created_at', 'updated_at']
+    actions = ['activate_candidates', 'deactivate_candidates']
+
+    def changelist_view(self, request, extra_context=None):
+        """Add import link to the changelist view."""
+        extra_context = extra_context or {}
+        extra_context['import_candidates_url'] = reverse('import_candidates_csv')
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def activate_candidates(self, request, queryset):
+        """Activate selected candidates."""
+        count = queryset.update(is_active=True)
+        self.message_user(request, f'Activated {count} candidates.')
+    activate_candidates.short_description = 'Activate selected candidates'
+
+    def deactivate_candidates(self, request, queryset):
+        """Deactivate selected candidates."""
+        count = queryset.update(is_active=False)
+        self.message_user(request, f'Deactivated {count} candidates.')
+    deactivate_candidates.short_description = 'Deactivate selected candidates'
 
     def vote_count(self, obj):
         """Display total votes received by this candidate."""

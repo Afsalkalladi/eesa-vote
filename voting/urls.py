@@ -23,4 +23,5 @@ urlpatterns = [
     path('audit/', views.audit_trail, name='audit_trail'),
     path('export-voters/', views.export_voters_csv, name='export_voters_csv'),
     path('import-voters/', views.import_voters_csv, name='import_voters_csv'),
+    path('import-candidates/', views.import_candidates_csv, name='import_candidates_csv'),
 ]

@@ -105,7 +105,49 @@ A secure, token-based online election system built for the Electrical Engineerin
    - Assign candidates to one or more positions
    - Optionally add photos and biographies
 
-5. **Import Voters**
+5. **Import Candidates (New!)**
+
+   You can now bulk import candidates from a CSV file using either the command line or web interface:
+
+   **Web Interface (Recommended):**
+
+   - Access via Django admin: `/admin/` → Candidates → "Import candidates from CSV"
+   - Or visit directly: `/import-candidates/`
+   - Features drag-and-drop upload, validation, and statistics
+
+   **Command Line:**
+
+   ```bash
+   # Create your CSV file with format: name,reg_no,description,position
+   # Example: candidates.csv
+
+   # Test the import first (dry run)
+   python manage.py import_candidates candidates.csv --dry-run
+
+   # If everything looks good, do the actual import
+   python manage.py import_candidates candidates.csv
+
+   # Update existing candidates
+   python manage.py import_candidates candidates.csv --update
+   ```
+
+   **CSV Format Example:**
+
+   ```csv
+   name,reg_no,description,position
+   John Smith,EE2021001,Experienced leader with vision,President
+   Jane Doe,EE2021045,Passionate about student welfare,Secretary
+   ```
+
+   See [CANDIDATE_IMPORT_GUIDE.md](CANDIDATE_IMPORT_GUIDE.md) for detailed instructions.
+
+6. **Add Candidates Manually**
+
+   - Create candidate profiles through Django admin
+   - Assign candidates to one or more positions
+   - Optionally add photos and biographies
+
+7. **Import Voters**
    - Use CSV import feature or management command
    - Format: `name,reg_no`
    - Tokens are automatically generated

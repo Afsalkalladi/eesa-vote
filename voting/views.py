@@ -686,6 +686,125 @@ def import_voters_csv(request):
     return render(request, 'voting/import_voters.html', context)
 
 
+@staff_member_required
+def import_candidates_csv(request):
+    """
+    Import candidates from CSV file via web interface.
+    """
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        csv_file = request.FILES['csv_file']
+        
+        try:
+            decoded_file = csv_file.read().decode('utf-8').splitlines()
+            reader = csv.DictReader(decoded_file)
+            
+            # Validate headers
+            required_headers = ['name', 'reg_no', 'description', 'position']
+            if not all(header in reader.fieldnames for header in required_headers):
+                missing_headers = [h for h in required_headers if h not in reader.fieldnames]
+                messages.error(
+                    request, 
+                    f'CSV file missing required headers: {", ".join(missing_headers)}. '
+                    f'Required: {", ".join(required_headers)}'
+                )
+                return render(request, 'voting/import_candidates.html', get_candidate_stats())
+            
+            created_count = 0
+            updated_count = 0
+            skipped_count = 0
+            errors = []
+            update_existing = request.POST.get('update_existing') == 'on'
+            
+            for row_num, row in enumerate(reader, start=2):
+                name = row.get('name', '').strip()
+                reg_no = row.get('reg_no', '').strip()
+                bio = row.get('description', '').strip()
+                position_name = row.get('position', '').strip()
+                
+                # Validate required fields
+                if not all([name, reg_no, position_name]):
+                    errors.append(f"Row {row_num}: Missing required fields (name, reg_no, or position)")
+                    continue
+                
+                # Check if position exists
+                try:
+                    position = Position.objects.get(title__iexact=position_name)
+                except Position.DoesNotExist:
+                    errors.append(f'Row {row_num}: Position "{position_name}" does not exist')
+                    continue
+                
+                # Check if candidate already exists
+                existing_candidate = Candidate.objects.filter(reg_no=reg_no).first()
+                
+                if existing_candidate:
+                    if update_existing:
+                        existing_candidate.name = name
+                        existing_candidate.bio = bio
+                        # Add position if not already assigned
+                        if position not in existing_candidate.positions.all():
+                            existing_candidate.positions.add(position)
+                        existing_candidate.save()
+                        updated_count += 1
+                    else:
+                        skipped_count += 1
+                else:
+                    candidate = Candidate.objects.create(
+                        name=name,
+                        reg_no=reg_no,
+                        bio=bio
+                    )
+                    candidate.positions.add(position)
+                    created_count += 1
+            
+            # Success message
+            if created_count > 0 or updated_count > 0:
+                message_parts = []
+                if created_count > 0:
+                    message_parts.append(f'Created: {created_count}')
+                if updated_count > 0:
+                    message_parts.append(f'Updated: {updated_count}')
+                if skipped_count > 0:
+                    message_parts.append(f'Skipped: {skipped_count}')
+                
+                messages.success(request, f'Import completed. {", ".join(message_parts)}')
+            else:
+                messages.warning(request, 'No candidates were imported.')
+            
+            # Show errors (limit to first 5)
+            if errors:
+                for error in errors[:5]:
+                    messages.warning(request, error)
+                if len(errors) > 5:
+                    messages.warning(request, f'... and {len(errors) - 5} more errors')
+                    
+        except Exception as e:
+            messages.error(request, f'Error importing CSV: {str(e)}')
+    
+    return render(request, 'voting/import_candidates.html', get_candidate_stats())
+
+
+def get_candidate_stats():
+    """Helper function to get candidate statistics for the import page."""
+    positions = Position.objects.prefetch_related('candidates').all()
+    position_stats = []
+    
+    total_candidates = Candidate.objects.count()
+    
+    for position in positions:
+        candidate_count = position.candidates.count()
+        position_stats.append({
+            'title': position.title,
+            'candidate_count': candidate_count,
+            'candidates': position.candidates.all()[:5]  # Show first 5 candidates
+        })
+    
+    return {
+        'total_candidates': total_candidates,
+        'position_stats': position_stats,
+        'available_positions': [p.title for p in positions]
+    }
+
+
 def audit_required(view_func):
     """
     Decorator to check if user is authenticated for audit access.
