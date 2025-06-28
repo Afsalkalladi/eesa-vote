@@ -38,16 +38,29 @@ A secure, token-based online election system built for the Electrical Engineerin
 - Pillow (for image handling)
 - **Development**: SQLite (included with Python)
 - **Production**: PostgreSQL (required)
+- **Image Storage**: GitHub repository for candidate photos (free)
 
 ### Installation
 
 1. **Clone and Setup**
 
    ```bash
-   cd /path/to/your/project
+   git clone https://github.com/yourusername/eesa-election-system.git
+   cd eesa-election-system
    python -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   pip install django pillow
+   pip install -r requirements.txt
+   ```
+
+2. **Environment Configuration**
+
+   ```bash
+   # Copy environment template
+   cp .env.example .env.github
+   
+   # Edit .env.github with your settings
+   # For development, you can leave GitHub settings as-is
+   # For production, configure GitHub storage (see GITHUB_STORAGE_SETUP.md)
    ```
 
 2. **Database Setup**
@@ -63,19 +76,27 @@ A secure, token-based online election system built for the Electrical Engineerin
    python manage.py createsuperuser
    ```
 
-4. **Import Sample Voters** (Optional)
+4. **Configure GitHub Storage** (Optional for development, required for production)
+
+   See [GITHUB_STORAGE_SETUP.md](GITHUB_STORAGE_SETUP.md) for detailed instructions on setting up free image hosting.
+
+5. **Import Sample Data** (Optional)
 
    ```bash
+   # Import sample voters
    python manage.py import_voters sample_voters.csv
+   
+   # Import sample candidates
+   python manage.py import_candidates sample_candidates.csv
    ```
 
-5. **Start Development Server**
+6. **Start Development Server**
 
    ```bash
    python manage.py runserver
    ```
 
-6. **Access the System**
+7. **Access the System**
    - Main Site: http://127.0.0.1:8000/
    - Admin Panel: http://127.0.0.1:8000/admin/
 
@@ -347,44 +368,52 @@ vote/
 - Optimize image uploads
 - Consider CDN for static files
 
-## 🌐 Deployment
+## 🌐 Production Deployment
 
-### Free Hosting on Render
+This application is production-ready and optimized for deployment on platforms like [Render](https://render.com).
 
-This project is ready for deployment on [Render](https://render.com), a free hosting platform.
+### Prerequisites for Production
 
-**Quick Deployment Steps:**
+1. **GitHub Repository for Images**: Set up a dedicated repository for storing candidate photos (see [GITHUB_STORAGE_SETUP.md](GITHUB_STORAGE_SETUP.md))
+2. **PostgreSQL Database**: Required for production (SQLite is development-only)
 
-1. **Push to GitHub** (if not already done):
+### Quick Deployment on Render
+
+1. **Fork/Clone this Repository**
 
    ```bash
-   git init
-   git add .
-   git commit -m "EESA Election System ready for deployment"
-   git remote add origin https://github.com/yourusername/your-repo-name.git
-   git push -u origin main
+   git clone https://github.com/yourusername/eesa-election-system.git
    ```
 
-2. **Deploy on Render**:
+2. **Set Up GitHub Image Storage**
+
+   Follow the guide in [GITHUB_STORAGE_SETUP.md](GITHUB_STORAGE_SETUP.md) to create your image repository and get your GitHub token.
+
+3. **Deploy on Render**:
 
    - Sign up at [render.com](https://render.com)
-   - **Create PostgreSQL database first** (required for production)
+   - **Create PostgreSQL database first**
    - Create a new Web Service
    - Connect your GitHub repository
    - Use these settings:
-     - **Build Command**: `./build.sh`
-     - **Start Command**: `gunicorn election_system.wsgi:application --bind 0.0.0.0:$PORT`
+     - **Build Command**: `pip install -r requirements.txt`
+     - **Start Command**: `gunicorn election_system.wsgi:application`
      - **Environment Variables**:
        - `DJANGO_SETTINGS_MODULE`: `election_system.production_settings`
-       - `DATABASE_URL`: [PostgreSQL URL from database] **REQUIRED**
-       - `SECRET_KEY`: Generate using `python generate_secret_key.py`
+       - `DATABASE_URL`: [Your PostgreSQL URL]
+       - `SECRET_KEY`: [Generate a secure secret key]
+       - `GITHUB_TOKEN`: [Your GitHub token]
+       - `GITHUB_IMAGES_REPO`: [Your image repository name]
+       - `USE_GITHUB_STORAGE`: `true`
 
-3. **Post-deployment**:
+4. **Post-deployment**:
    - Access admin at: `https://your-app.onrender.com/admin/`
-   - Default admin: username=`admin`, password=`admin123`
-   - **⚠️ Change the admin password immediately!**
+   - Create your admin user
+   - Import your voter and candidate data
 
-For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+For detailed setup instructions, see:
+- [GITHUB_STORAGE_SETUP.md](GITHUB_STORAGE_SETUP.md) - Image storage configuration
+- [CLOUD_STORAGE_GUIDE.md](CLOUD_STORAGE_GUIDE.md) - Cloud storage options and setup
 
 ### Live Demo
 
